@@ -1,0 +1,50 @@
+Video game experience has to be fluid and engaging. For that reason, performance is very
+important. Can you list and describe what strategies can be used to optimize and improve
+performance of a mobile game? It can be related with GPU, CPU, rendering, I/O operations,
+concurrency, compression algorithms, animations, assets, etc. For every technique you think of,
+provide an explanation of how it works.
+
+
+-Data oriented approach
+
+Use a game engine with a data oriented approach. Data oriented engines make better use of memory caches that 
+in modern hardware is one of the main bottlenecks. The idea is to provide data layout in a way that is more 
+efficient, normally using arrays to take advantage of contiguous memory. In contrast with object oriented that 
+the focus is in providing data types abstractions here the focus is into pass the data to transform.
+
+-Binary formats
+
+Where possible use binary formats to save the data in contrast with text formats. Binary formats are faster to use than 
+parsing a text format. 
+
+-Batching
+
+In order to reduce the communication between CPU and GPU(drawcalls) we can use batching of meshes with the same materials.
+API graphics use draw calls to send information like meshes that are in main memory to gpu memory, instead of sending each 
+information separetely, increasing the information that it is send each frame, we can group meshes to be more efficient in 
+this aspect.
+
+-Use of LOD (level of detail).
+
+Depending on how big is going to be seen an object from the current point of view, we can swap meshes with a great number of polygons 
+for other alternatives with less dynamically or use smaller textures.
+
+-Control polygon count of the assets.
+
+In general for mobile it is desirable to use meshes with a low number of polygons. You can try to optmize meshes too.
+
+-Fragment shaders
+
+Control the complexity of the calculations in the fragment shaders. 
+Fragment shaders are going to be executed for each cantididate pixel rendered in the screen so it is important not to have complex calculations, 
+for example using a simpler light model.
+
+-Use of compressed audio (mp3).
+
+-Minimize audio clips active at the same time.
+
+
+
+
+
+
