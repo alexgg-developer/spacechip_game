@@ -1,0 +1,6 @@
+.vs
+Debug/
+SDLGameTest/Release/*
+Release/*
+SDLGameTest/x64/*
+x64/*
