@@ -64,6 +64,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="GLM.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -151,7 +152,25 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dodf\EnemyComponentMgr.cpp" />
+    <ClCompile Include="dodf\Entity.cpp" />
+    <ClCompile Include="dodf\EntityManager.cpp" />
+    <ClCompile Include="dodf\IComponentManager.cpp" />
+    <ClCompile Include="dodf\MemoryPool.cpp" />
+    <ClCompile Include="dodf\TransformComponentMgr.cpp" />
+    <ClCompile Include="game\Game.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dodf\Assert.h" />
+    <ClInclude Include="dodf\EnemyComponentMgr.h" />
+    <ClInclude Include="dodf\Entity.h" />
+    <ClInclude Include="dodf\EntityManager.h" />
+    <ClInclude Include="dodf\IComponentManager.h" />
+    <ClInclude Include="dodf\Instance.h" />
+    <ClInclude Include="dodf\MemoryPool.h" />
+    <ClInclude Include="dodf\TransformComponentMgr.h" />
+    <ClInclude Include="game\Game.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
