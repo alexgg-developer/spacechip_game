@@ -1,6 +1,7 @@
 #include "TransformComponentMgr.h"
-#include "Assert.h"
-#include "MemoryPool.h"
+
+#include "../dodf/Assert.h"
+#include "../dodf/MemoryPool.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

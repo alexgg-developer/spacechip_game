@@ -19,8 +19,6 @@ protected :
 		size_t memoryUsed;
 		void *data;        ///< Buffer with instance data.
 	};
-	//references to the entities are using this component
-	std::vector<Entity*> m_entities;
 	//entity id, to instance
 	//it is recommended to use size_t or ptrdiff_t for arrays and pointer arithmetic
 	//ref: https://www.viva64.com/en/a/0050/#ID0ENIAE

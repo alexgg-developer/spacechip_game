@@ -27,16 +27,16 @@
     <ClCompile Include="dodf\EntityManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dodf\TransformComponentMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dodf\IComponentManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dodf\EnemyComponentMgr.cpp">
+    <ClCompile Include="game\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\Game.cpp">
+    <ClCompile Include="game\EnemyComponentMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\TransformComponentMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,16 +56,16 @@
     <ClInclude Include="dodf\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dodf\TransformComponentMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dodf\IComponentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dodf\EnemyComponentMgr.h">
+    <ClInclude Include="game\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\Game.h">
+    <ClInclude Include="game\EnemyComponentMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\TransformComponentMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

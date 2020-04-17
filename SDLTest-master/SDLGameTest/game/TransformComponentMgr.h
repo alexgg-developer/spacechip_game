@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IComponentManager.h"
+#include "../dodf/IComponentManager.h"
 #include <glm/glm.hpp>
 
 #include <unordered_map>

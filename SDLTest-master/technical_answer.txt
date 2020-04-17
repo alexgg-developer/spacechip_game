@@ -21,8 +21,12 @@ parsing a text format.
 
 In order to reduce the communication between CPU and GPU(drawcalls) we can use batching of meshes with the same materials.
 API graphics use draw calls to send information like meshes that are in main memory to gpu memory, instead of sending each 
-information separetely, increasing the information that it is send each frame, we can group meshes to be more efficient in 
+information separetely, increasing the information that it is sent each frame, we can group meshes to be more efficient in 
 this aspect.
+
+-Atlasing
+
+We can group textures together in order to facilitate batching and reduce drawcalls.
 
 -Use of LOD (level of detail).
 
@@ -33,18 +37,51 @@ for other alternatives with less dynamically or use smaller textures.
 
 In general for mobile it is desirable to use meshes with a low number of polygons. You can try to optmize meshes too.
 
--Fragment shaders
+-Fragment shaders (fill rate)
 
 Control the complexity of the calculations in the fragment shaders. 
 Fragment shaders are going to be executed for each cantididate pixel rendered in the screen so it is important not to have complex calculations, 
 for example using a simpler light model.
 
+-Shader optimization.
+
+Use smaller data types, for example replacing float data types of 32 bits for the ones using 16 o 12 bits where possible.
+
 -Use of compressed audio (mp3).
 
 -Minimize audio clips active at the same time.
 
+-Reduce texture file size
+
+The size of texture affects GPU memory bandwith, if the total memory pushed per second exceeds the graphics card's total memory we can have a bottleneck.
+
+-Baked animations
+
+This will depend on the 3D rigging and animation tool that we are using, and the overall vertex count of our mesh; in some cases baking animations can result in much
+smaller file sizes and memory overhead than blended/skinned animations. Baked animations work by storing a keyframed position for each vertex for each frame that
+was sampled, and if the mesh's polygon count is low enough, then we may see some significant savings through this simple change.
 
 
+-Multithreaded rendering
 
+We can use a thread to free the main thread of work if the rendering API allows it. 
+The thread purpose is to undertake the heavy workload that it takes to push rendering commands through the graphics API and driver, to get the 
+rendering instructions into the GPU's Command Buffer. This can save an enormous number of CPU cycles for the main thread, where the overwhelming majority of
+other CPU tasks take place.
+
+-GPU Skinning
+
+If we are CPU bound but we can send more work to the GPU we can try this technique.
+Skinning is the process where mesh vertices are transformed based on the current location of their animated bones. 
+The animation system, working on the CPU, only transforms the bones, but another step in the rendering process must take care of the vertex transformations 
+to place the vertices around those bones, performing a weighted average over the bones connected to those vertices.
+Otherwise if we are GPU bound but we the CPU is more or less free we can desactivate this to free the GPU.
+
+-Occlusion Culling
+
+If we have noticed that we are overdrawing (depending on the order in which objects are rendered we can be rendering a lot of objects that they are occluded 
+by others), we can use this technique to try to lessen overdraw. 
+The system works by partitioning the space of our scene into a series of cells and flying through the world with a virtual camera making note of which cells are invisible
+from other cells (are occluded) based on the size and position of the objects present.
 
 
