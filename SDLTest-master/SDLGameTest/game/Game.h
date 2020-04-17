@@ -11,7 +11,6 @@
 #include <iostream>
 #include <array>
 
-#include "TransformComponentMgr.h"
 #include "EnemyComponentMgr.h"
 
 #include "../dodf/Entity.h"
@@ -26,13 +25,12 @@ public:
 	void run();
 
 private:
-	static const size_t ENEMY_COUNT = 55;
+	static const size_t ENEMY_COUNT = 110;
 
 	SDL_Renderer * m_renderer;
 	SDL_Window * m_window;
 
 	EntityManager m_entityManager;
-	//TransformComponentMgr m_transformComponentMgr;
 	EnemyComponentMgr m_enemyComponentMgr;
 	//std::array<Entity, ENEMY_COUNT> m_enemies;
 	//std::vector<Entity> m_enemies;

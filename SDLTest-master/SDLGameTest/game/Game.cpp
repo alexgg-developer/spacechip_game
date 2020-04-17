@@ -2,6 +2,9 @@
 
 #include "../dodf/MemoryPool.h"
 
+#include "Vec.h"
+
+
 Game::Game()
 {
 
@@ -22,23 +25,24 @@ int Game::init()
 
 void Game::initEnemies()
 {
-	m_enemyComponentMgr.allocate(100);
+	m_enemyComponentMgr.allocate(ENEMY_COUNT);
 	m_enemies = (Entity*)dodf::MemoryPool::Get(sizeof(Entity) * ENEMY_COUNT);
-	const size_t NUMBER_COLUMNS = 11;
-	const float LEFT_MARGIN = 70.0f;
-	const float TOP_MARGIN = 90.0f;
-	const float ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
-	const float HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3.0f;
-	const float VERTICAL_MARGIN_BETWEEN_ENEMIES = 3.0f;
+	const size_t NUMBER_ROWS = 5u;
+	const size_t NUMBER_COLUMNS = (ENEMY_COUNT / NUMBER_ROWS);
+	const size_t LEFT_MARGIN = 70u;
+	const size_t TOP_MARGIN = 90u;
+	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
+	const size_t HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3u;
+	const size_t VERTICAL_MARGIN_BETWEEN_ENEMIES = 3u;
 	for (size_t i = 0; i < ENEMY_COUNT; ++i) {
 		m_enemies[i] = m_entityManager.create();
-		glm::vec3 position;
+		vec3 position;
 		//position.x = i * EnemyComponentMgr::ENEMY_SIZE;
 		size_t horizontalIndex = i % NUMBER_COLUMNS;
-		position.x = LEFT_MARGIN + static_cast<float>(horizontalIndex) * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES);
+		position.x = LEFT_MARGIN + horizontalIndex * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES);
 		size_t verticalIndex = i / NUMBER_COLUMNS;
-		position.y = TOP_MARGIN + static_cast<float>(verticalIndex) * (ENEMY_SIZE + VERTICAL_MARGIN_BETWEEN_ENEMIES);
-		position.z = 0.0f;
+		position.y = TOP_MARGIN + verticalIndex * (ENEMY_SIZE + VERTICAL_MARGIN_BETWEEN_ENEMIES);
+		position.z = 0u;
 		m_enemyComponentMgr.add(m_enemies[i], position);
 	}		
 }
@@ -52,6 +56,18 @@ void Game::run()
 	}
 
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(m_renderer, space_ship_surface);
+	if (!texture) {
+		std::cout << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
+		//return 0;
+	}
+
+	SDL_Surface *space_ship_enemy_surface = IMG_Load("Assets/Enemy/spaceship_enemy_red.png");
+	if (!space_ship_surface) {
+		std::cout << "IMG_Load Error: " << SDL_GetError() << std::endl;
+		//return 0;
+	}
+
+	SDL_Texture *texture_enemy = SDL_CreateTextureFromSurface(m_renderer, space_ship_enemy_surface);
 	if (!texture) {
 		std::cout << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
 		//return 0;
@@ -104,8 +120,9 @@ void Game::run()
 
 		auto positions = m_enemyComponentMgr.getPositions();
 		for (size_t i = 0; i < ENEMY_COUNT; ++i) {
-			texture_rect.x = positions[i].x;
-			SDL_RenderCopy(m_renderer, texture, nullptr, &texture_rect);
+			texture_rect.x = (int)positions[i].x;
+			texture_rect.y = (int)positions[i].y;
+			SDL_RenderCopy(m_renderer, texture_enemy, nullptr, &texture_rect);
 		}
 		
 		SDL_RenderPresent(m_renderer);

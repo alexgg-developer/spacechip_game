@@ -3,7 +3,10 @@
 
 #include "EnemyComponentMgr.h"
 
-const float EnemyComponentMgr::ENEMY_SIZE = 60.0f;
+
+using namespace dodf;
+
+const size_t EnemyComponentMgr::ENEMY_SIZE = 30;
 
 void EnemyComponentMgr::clean()
 {
@@ -17,12 +20,12 @@ void EnemyComponentMgr::allocate(size_t size)
 	//m_buffer.data = MemoryPool::Get(bytes);
 	//m_buffer.allocated = size;
 	m_data.life = static_cast<size_t*>(MemoryPool::Get(size * sizeof(size_t)));
-	m_data.position = static_cast<glm::vec3*>(MemoryPool::Get(size * sizeof(glm::vec3)));
+	m_data.position = static_cast<vec3*>(MemoryPool::Get(size * sizeof(vec3)));
 
 	//m_buffer.n = 0;
 }
 
-void EnemyComponentMgr::add(const Entity& e, const glm::vec3& position)
+void EnemyComponentMgr::add(const Entity& e, const vec3& position)
 {
 	auto instance = Instance::create(m_instanceCount);
 	//m_map[e.index()] = instance;
