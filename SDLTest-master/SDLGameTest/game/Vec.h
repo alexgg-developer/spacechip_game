@@ -1,7 +1,12 @@
 #pragma once
 
 
+struct vec2
+{
+	float x, y;
+};
+
 struct vec3
 {
-	size_t x, y, z;
+	float x, y, z;
 };

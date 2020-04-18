@@ -157,6 +157,10 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClCompile Include="dodf\EntityManager.cpp" />
     <ClCompile Include="dodf\MemoryPool.cpp" />
     <ClCompile Include="game\Game.cpp" />
+    <ClCompile Include="game\Input.cpp" />
+    <ClCompile Include="game\Player.cpp" />
+    <ClCompile Include="game\PlayerController.cpp" />
+    <ClCompile Include="game\Timer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +171,10 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClInclude Include="dodf\Instance.h" />
     <ClInclude Include="dodf\MemoryPool.h" />
     <ClInclude Include="game\Game.h" />
+    <ClInclude Include="game\Input.h" />
+    <ClInclude Include="game\Player.h" />
+    <ClInclude Include="game\PlayerController.h" />
+    <ClInclude Include="game\Timer.h" />
     <ClInclude Include="game\Vec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

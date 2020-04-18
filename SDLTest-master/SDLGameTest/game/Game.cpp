@@ -5,20 +5,34 @@
 #include "Vec.h"
 
 
-Game::Game()
+Game::Game(): m_playerController(m_player)
 {
 
+}
+
+Game::~Game()
+{
+	dodf::MemoryPool::Destroy();
+
+	//TO DO: ADD ALL TEXTURES AND SURFACES
+	//SDL_DestroyTexture(texture);
+	//SDL_FreeSurface(space_ship_surface);
+	SDL_DestroyRenderer(m_renderer);
+	SDL_DestroyWindow(m_window);
+	SDL_Quit();
 }
 
 int Game::init()
 {
 	int error = 0;
 	error += initSDL();
-	size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
-	dodf::MemoryPool::Initialize(initSize);
-	//m_transformComponentMgr.allocate(100);
-	m_enemyComponentMgr.allocate(100);
-	initEnemies();
+	if (!error) {
+		size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
+		dodf::MemoryPool::Initialize(initSize);
+		m_enemyComponentMgr.allocate(100);
+		initEnemies();
+		initPlayer();
+	}
 
 	return error;
 }
@@ -39,12 +53,21 @@ void Game::initEnemies()
 		vec3 position;
 		//position.x = i * EnemyComponentMgr::ENEMY_SIZE;
 		size_t horizontalIndex = i % NUMBER_COLUMNS;
-		position.x = LEFT_MARGIN + horizontalIndex * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES);
+		position.x = static_cast<float>(LEFT_MARGIN + horizontalIndex * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES));
 		size_t verticalIndex = i / NUMBER_COLUMNS;
-		position.y = TOP_MARGIN + verticalIndex * (ENEMY_SIZE + VERTICAL_MARGIN_BETWEEN_ENEMIES);
-		position.z = 0u;
+		position.y = static_cast<float>(TOP_MARGIN + verticalIndex * (ENEMY_SIZE + VERTICAL_MARGIN_BETWEEN_ENEMIES));
+		position.z = 0.0f;
 		m_enemyComponentMgr.add(m_enemies[i], position);
 	}		
+}
+
+void Game::initPlayer()
+{
+	vec3 position;
+	position.x = 70.0f;
+	position.y = static_cast<float>(WINDOW_HEIGHT - 100u);
+	m_player.setPosition(position);
+	m_playerController.setLimits(30.0f, static_cast<float>(WINDOW_WIDTH) - 30.0f - static_cast<float>(Player::SIZE));
 }
 
 void Game::run()
@@ -75,7 +98,6 @@ void Game::run()
 
 	//while()
 	SDL_Event e;
-	bool running = true;
 	
 	SDL_Rect texture_rect;
 	texture_rect.x = 0;   // the x coordinate
@@ -83,39 +105,13 @@ void Game::run()
 	texture_rect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
 	texture_rect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
 
-	while (running) {
+	m_timer.start();
+
+	while (!m_input.check(Input::KESC)) {
 		SDL_PollEvent(&e);
-		switch (e.type) {
-		case SDL_QUIT:
-			running = false;
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			break;
-		case SDL_KEYDOWN:
-			break;
-		case SDL_USEREVENT:
-			break;
-		default:
-			break;
-		}
-
-		/*SDL_Rect texture_rect;
-		texture_rect.x = 0;   // the x coordinate
-		texture_rect.y = 0;   // the y coordinate
-		texture_rect.w = 64;  // the width of the texture
-		texture_rect.h = 128;  // the height of the texture
-
-
-		SDL_Rect texture_rect_;
-		texture_rect_.x = 64;   // the x coordinate
-		texture_rect_.y = 0;   // the y coordinate
-		texture_rect_.w = 64;  // the width of the texture
-		texture_rect_.h = 64;  // the height of the texture
-
-		SDL_RenderCopy(m_renderer, texture, nullptr, &texture_rect_);*/
-
-
-
+		m_input.read(e);
+		m_playerController.update(m_input, m_timer.getDeltaTime());
+		
 		SDL_RenderClear(m_renderer);
 
 		auto positions = m_enemyComponentMgr.getPositions();
@@ -124,15 +120,16 @@ void Game::run()
 			texture_rect.y = (int)positions[i].y;
 			SDL_RenderCopy(m_renderer, texture_enemy, nullptr, &texture_rect);
 		}
+
+		auto playerPosition = m_player.getPosition();
+		texture_rect.x = (int)playerPosition.x;   // the x coordinate
+		texture_rect.y = (int)playerPosition.y;   // the y coordinate
+		texture_rect.w = (int)Player::SIZE;  // the width of the texture
+		texture_rect.h = (int)Player::SIZE;  // the height of the texture
+		SDL_RenderCopy(m_renderer, texture, nullptr, &texture_rect);
 		
 		SDL_RenderPresent(m_renderer);
 	}
-
-	SDL_DestroyTexture(texture);
-	SDL_FreeSurface(space_ship_surface);
-	SDL_DestroyRenderer(m_renderer);
-	SDL_DestroyWindow(m_window);
-	SDL_Quit();
 }
 
 void Game::draw()
@@ -148,7 +145,7 @@ int Game::initSDL()
 	}
 
 	m_window =
-		SDL_CreateWindow("Hello World!", 100, 100, 800, 600, SDL_WINDOW_SHOWN);
+		SDL_CreateWindow("Space invaders!", 100, 100, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	if (m_window == nullptr) {
 		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
