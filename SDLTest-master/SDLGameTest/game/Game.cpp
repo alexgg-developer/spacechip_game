@@ -12,27 +12,25 @@ Game::Game(): m_playerController(m_player)
 
 Game::~Game()
 {
-	dodf::MemoryPool::Destroy();
-
-	//TO DO: ADD ALL TEXTURES AND SURFACES
-	//SDL_DestroyTexture(texture);
-	//SDL_FreeSurface(space_ship_surface);
+	m_textureMgr.clean();
 	SDL_DestroyRenderer(m_renderer);
 	SDL_DestroyWindow(m_window);
 	SDL_Quit();
+	dodf::MemoryPool::Destroy();
 }
 
 int Game::init()
 {
 	int error = 0;
 	error += initSDL();
-	if (!error) {
-		size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
-		dodf::MemoryPool::Initialize(initSize);
-		m_enemyComponentMgr.allocate(100);
-		initEnemies();
-		initPlayer();
-	}
+	if (error) return error;
+	size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
+	dodf::MemoryPool::Initialize(initSize);
+	m_enemyComponentMgr.allocate(100);
+	initEnemies();
+	initPlayer();
+	error = m_textureMgr.init(m_renderer);
+	if (error) return error;
 
 	return error;
 }
@@ -72,68 +70,44 @@ void Game::initPlayer()
 
 void Game::run()
 {
-	SDL_Surface *space_ship_surface = IMG_Load("Assets/Player/spaceship.png");
-	if (!space_ship_surface) {
-		std::cout << "IMG_Load Error: " << SDL_GetError() << std::endl;
-		//return 0;
-	}
-
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(m_renderer, space_ship_surface);
-	if (!texture) {
-		std::cout << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-		//return 0;
-	}
-
-	SDL_Surface *space_ship_enemy_surface = IMG_Load("Assets/Enemy/spaceship_enemy_red.png");
-	if (!space_ship_surface) {
-		std::cout << "IMG_Load Error: " << SDL_GetError() << std::endl;
-		//return 0;
-	}
-
-	SDL_Texture *texture_enemy = SDL_CreateTextureFromSurface(m_renderer, space_ship_enemy_surface);
-	if (!texture) {
-		std::cout << "IMG_LoadTexture Error: " << SDL_GetError() << std::endl;
-		//return 0;
-	}
-
 	//while()
 	SDL_Event e;
 	
-	SDL_Rect texture_rect;
-	texture_rect.x = 0;   // the x coordinate
-	texture_rect.y = 0;   // the y coordinate
-	texture_rect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
-	texture_rect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
+	
 
 	m_timer.start();
 
 	while (!m_input.check(Input::KESC)) {
 		SDL_PollEvent(&e);
 		m_input.read(e);
-		m_playerController.update(m_input, m_timer.getDeltaTime());
-		
-		SDL_RenderClear(m_renderer);
-
-		auto positions = m_enemyComponentMgr.getPositions();
-		for (size_t i = 0; i < ENEMY_COUNT; ++i) {
-			texture_rect.x = (int)positions[i].x;
-			texture_rect.y = (int)positions[i].y;
-			SDL_RenderCopy(m_renderer, texture_enemy, nullptr, &texture_rect);
-		}
-
-		auto playerPosition = m_player.getPosition();
-		texture_rect.x = (int)playerPosition.x;   // the x coordinate
-		texture_rect.y = (int)playerPosition.y;   // the y coordinate
-		texture_rect.w = (int)Player::SIZE;  // the width of the texture
-		texture_rect.h = (int)Player::SIZE;  // the height of the texture
-		SDL_RenderCopy(m_renderer, texture, nullptr, &texture_rect);
-		
-		SDL_RenderPresent(m_renderer);
+		m_playerController.update(m_input, m_timer.getDeltaTime());		
+		draw();
 	}
 }
 
 void Game::draw()
 {
+	SDL_RenderClear(m_renderer);
+	SDL_Texture* textureEnemy = m_textureMgr.getTexture(TextureMgr::TextureID::ENEMY);
+	SDL_Rect textureRect;
+	textureRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
+	textureRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
+	auto positions = m_enemyComponentMgr.getPositions();
+	for (size_t i = 0; i < ENEMY_COUNT; ++i) {
+		textureRect.x = (int)positions[i].x;
+		textureRect.y = (int)positions[i].y;
+		SDL_RenderCopy(m_renderer, textureEnemy, nullptr, &textureRect);
+	}
+
+	SDL_Texture* texturePlayer = m_textureMgr.getTexture(TextureMgr::TextureID::PLAYER);
+	auto playerPosition = m_player.getPosition();
+	textureRect.x = (int)playerPosition.x;   // the x coordinate
+	textureRect.y = (int)playerPosition.y;   // the y coordinate
+	textureRect.w = (int)Player::SIZE;  // the width of the texture
+	textureRect.h = (int)Player::SIZE;  // the height of the texture
+	SDL_RenderCopy(m_renderer, texturePlayer, nullptr, &textureRect);
+
+	SDL_RenderPresent(m_renderer);
 }
 
 

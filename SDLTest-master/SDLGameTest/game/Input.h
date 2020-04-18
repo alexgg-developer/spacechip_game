@@ -18,7 +18,7 @@ public:
 	Input();
 	void read(SDL_Event const & event);
 	bool check(unsigned int key) const;
-	bool checkPressed(unsigned int key);
+	bool checkPressed(unsigned int key)	;
 	bool checkReleased(unsigned int key);
 
 private:

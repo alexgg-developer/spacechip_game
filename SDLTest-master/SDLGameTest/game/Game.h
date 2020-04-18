@@ -16,6 +16,7 @@
 #include "Input.h"
 #include "Timer.h"
 #include "PlayerController.h"
+#include "TextureMgr.h"
 
 #include "../dodf/Entity.h"
 #include "../dodf/EntityManager.h"
@@ -46,7 +47,7 @@ private:
 	Input m_input;
 	Timer m_timer;
 	PlayerController m_playerController;
-
+	TextureMgr m_textureMgr;
 	void initPlayer();
 	void initEnemies();
 	int initSDL();
