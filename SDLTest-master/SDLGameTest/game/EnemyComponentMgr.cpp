@@ -22,13 +22,13 @@ void EnemyComponentMgr::allocate(size_t size)
 	m_data.life = static_cast<size_t*>(MemoryPool::Get(size * sizeof(size_t)));
 	m_data.position = static_cast<vec3*>(MemoryPool::Get(size * sizeof(vec3)));
 
-	//m_buffer.n = 0;
+	//m_buffer.n = 0;	
 }
 
 void EnemyComponentMgr::add(const Entity& e, const vec3& position)
 {
 	auto instance = Instance::create(m_instanceCount);
-	//m_map[e.index()] = instance;
+	m_map[e.index()] = instance;
 	m_data.life[instance.i] = rand() % 3u + 1u;
 	m_data.position[instance.i] = position;
 	++m_instanceCount;

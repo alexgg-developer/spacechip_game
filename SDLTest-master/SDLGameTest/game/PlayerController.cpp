@@ -12,6 +12,11 @@ void PlayerController::setLimits(float leftLimit, float rightLimit)
 	m_rightLimit = rightLimit;
 }
 
+void PlayerController::setShootCallback(std::function <void(void)> callback)
+{
+	m_shootCallback = callback;
+}
+
 
 
 void PlayerController::update(const Input& input, float dt)
@@ -30,4 +35,9 @@ void PlayerController::update(const Input& input, float dt)
 	position.x = fmax(position.x, m_leftLimit);
 	position.x = fmin(position.x, m_rightLimit);
 	m_player.setPosition(position);
+
+
+	if (input.checkPressed(Input::KSPACE)) {
+		m_shootCallback();
+	}
 }

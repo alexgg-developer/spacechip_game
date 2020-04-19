@@ -29,6 +29,7 @@ int TextureMgr::init(SDL_Renderer* const renderer)
 	int error = 0;
 	error += loadTexture(ENEMY, "Assets/Enemy/spaceship_enemy_red.png", renderer);
 	error += loadTexture(PLAYER, "Assets/Player/spaceship.png", renderer);
+	error += loadTexture(PLAYER_BULLET, "Assets/Player/bullet.png", renderer);
 
 	return error;
 }

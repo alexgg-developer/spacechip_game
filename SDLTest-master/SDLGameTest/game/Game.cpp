@@ -26,9 +26,12 @@ int Game::init()
 	if (error) return error;
 	size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
 	dodf::MemoryPool::Initialize(initSize);
-	m_enemyComponentMgr.allocate(100);
+	m_enemyComponentMgr.allocate(100u);
+	size_t projectileMax = 30u;
+	m_projectileComponentMgr.allocate(projectileMax);
+	m_projectiles.reserve(projectileMax);
 	initEnemies();
-	initPlayer();
+	initPlayer();	
 	error = m_textureMgr.init(m_renderer);
 	if (error) return error;
 
@@ -66,21 +69,22 @@ void Game::initPlayer()
 	position.y = static_cast<float>(WINDOW_HEIGHT - 100u);
 	m_player.setPosition(position);
 	m_playerController.setLimits(30.0f, static_cast<float>(WINDOW_WIDTH) - 30.0f - static_cast<float>(Player::SIZE));
+	m_playerController.setShootCallback(std::bind(&Game::shoot, this));
 }
 
 void Game::run()
 {
 	//while()
-	SDL_Event e;
-	
-	
+	SDL_Event e;	
 
 	m_timer.start();
 
 	while (!m_input.check(Input::KESC)) {
 		SDL_PollEvent(&e);
 		m_input.read(e);
-		m_playerController.update(m_input, m_timer.getDeltaTime());		
+		float dt = m_timer.getDeltaTime();
+		m_playerController.update(m_input, dt);		
+		m_projectileComponentMgr.update(dt);
 		draw();
 	}
 }
@@ -107,6 +111,17 @@ void Game::draw()
 	textureRect.h = (int)Player::SIZE;  // the height of the texture
 	SDL_RenderCopy(m_renderer, texturePlayer, nullptr, &textureRect);
 
+	SDL_Texture* texturePlayerBullet = m_textureMgr.getTexture(TextureMgr::TextureID::PLAYER_BULLET);
+	auto projectilePositions = m_projectileComponentMgr.getPositions();
+	size_t numberProjectiles = m_projectileComponentMgr.getSize();
+	textureRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;  
+	textureRect.h = (int)ProjectileComponentMgr::PROJECTILE_SIZE;  
+	for (size_t i = 0; i < numberProjectiles; ++i) {
+		textureRect.x = (int)projectilePositions[i].x;
+		textureRect.y = (int)projectilePositions[i].y;
+		SDL_RenderCopy(m_renderer, texturePlayerBullet, nullptr, &textureRect);
+	}
+	
 	SDL_RenderPresent(m_renderer);
 }
 
@@ -137,4 +152,10 @@ int Game::initSDL()
 	}
 
 	return 0;
+}
+
+void Game::shoot()
+{
+	m_projectiles.push_back(m_entityManager.create());
+	m_projectileComponentMgr.add(m_projectiles.back(), m_player.getPosition(), -100.0f);
 }

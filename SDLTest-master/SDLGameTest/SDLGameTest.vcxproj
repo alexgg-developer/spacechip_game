@@ -160,6 +160,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClCompile Include="game\Input.cpp" />
     <ClCompile Include="game\Player.cpp" />
     <ClCompile Include="game\PlayerController.cpp" />
+    <ClCompile Include="game\ProjectileComponentMgr.cpp" />
     <ClCompile Include="game\TextureMgr.cpp" />
     <ClCompile Include="game\Timer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -175,6 +176,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClInclude Include="game\Input.h" />
     <ClInclude Include="game\Player.h" />
     <ClInclude Include="game\PlayerController.h" />
+    <ClInclude Include="game\ProjectileComponentMgr.h" />
     <ClInclude Include="game\TextureMgr.h" />
     <ClInclude Include="game\Timer.h" />
     <ClInclude Include="game\Vec.h" />

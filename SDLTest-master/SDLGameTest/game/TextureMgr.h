@@ -21,7 +21,8 @@ public:
 	enum TextureID: size_t {
 		ENEMY,
 		PLAYER,
-		/*PLAYER_BULLET, 
+		PLAYER_BULLET,
+		/*
 		ENEMY_BULLET,
 		OBSTACLE,*/
 		SIZE

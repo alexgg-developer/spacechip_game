@@ -12,6 +12,7 @@
 #include <array>
 
 #include "EnemyComponentMgr.h"
+#include "ProjectileComponentMgr.h"
 #include "Player.h"
 #include "Input.h"
 #include "Timer.h"
@@ -40,15 +41,19 @@ private:
 
 	EntityManager m_entityManager;
 	EnemyComponentMgr m_enemyComponentMgr;
+	ProjectileComponentMgr m_projectileComponentMgr;
 	//std::array<Entity, ENEMY_COUNT> m_enemies;
 	//std::vector<Entity> m_enemies;
+	std::vector<Entity> m_projectiles;
 	Entity* m_enemies;
 	Player m_player;
 	Input m_input;
 	Timer m_timer;
 	PlayerController m_playerController;
 	TextureMgr m_textureMgr;
+
 	void initPlayer();
 	void initEnemies();
 	int initSDL();
+	void shoot();
 };

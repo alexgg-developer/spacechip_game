@@ -15,6 +15,7 @@ void Input::read(SDL_Event const & event)
 	for (size_t i = 0; i < nkeys; ++i) keys[i] = keys[i] & 0x0001;
 	switch (event.type) {
 	case SDL_KEYDOWN:
+		if (event.key.repeat) break;
 		switch (event.key.keysym.sym) {
 		case SDLK_UP:
 			keys[KUP] = KEY_PRESSED;
@@ -94,12 +95,12 @@ bool Input::check(unsigned int key) const
 	return keys[key] == KEY_ON || keys[key] == KEY_PRESSED;
 }
 
-bool Input::checkPressed(unsigned int key)
+bool Input::checkPressed(unsigned int key) const
 {
-	return keys[key] == KEY_PRESSED;
+ 	return keys[key] == KEY_PRESSED;
 }
 
-bool Input::checkReleased(unsigned int key)
+bool Input::checkReleased(unsigned int key) const
 {
 	return keys[key] == KEY_RELEASED;
 }
