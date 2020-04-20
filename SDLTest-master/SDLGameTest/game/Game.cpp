@@ -5,8 +5,11 @@
 #include "Vec.h"
 
 #include <algorithm>
+#include <random>
 
-Game::Game(): m_playerController(m_player)
+const float Game::INTERVAL_ENEMIES_SHOOT = 2.0f;
+
+Game::Game(): m_playerController(m_player), m_timerEnemyShoot(0.0f)
 {
 
 }
@@ -30,7 +33,8 @@ int Game::init()
 	m_enemyComponentMgr.allocate(100u);
 	size_t projectileMax = 30u;
 	m_projectileComponentMgr.allocate(projectileMax);
-	m_projectileComponentMgr.setLimits(30.0f, static_cast<float>(WINDOW_HEIGHT) - 100.0f);
+	//y = 0 on top
+	m_projectileComponentMgr.setLimits(static_cast<float>(WINDOW_HEIGHT) - 30.0f, 30.0f);
 	Entity e;
 	using std::placeholders::_1;
 	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
@@ -46,7 +50,7 @@ int Game::init()
 void Game::initEnemies()
 {
 	m_enemyComponentMgr.allocate(ENEMY_COUNT);
-	m_enemies = (Entity*)dodf::MemoryPool::Get(sizeof(Entity) * ENEMY_COUNT);
+	m_enemies.reserve(ENEMY_COUNT);
 	const size_t NUMBER_ROWS = 5u;
 	const size_t NUMBER_COLUMNS = (ENEMY_COUNT / NUMBER_ROWS);
 	const size_t LEFT_MARGIN = 70u;
@@ -55,7 +59,7 @@ void Game::initEnemies()
 	const size_t HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3u;
 	const size_t VERTICAL_MARGIN_BETWEEN_ENEMIES = 3u;
 	for (size_t i = 0; i < ENEMY_COUNT; ++i) {
-		m_enemies[i] = m_entityManager.create();
+		m_enemies.push_back(m_entityManager.create());
 		vec3 position;
 		//position.x = i * EnemyComponentMgr::ENEMY_SIZE;
 		size_t horizontalIndex = i % NUMBER_COLUMNS;
@@ -90,7 +94,14 @@ void Game::run()
 		float dt = m_timer.getDeltaTime();
 		m_playerController.update(m_input, dt);		
 		m_projectileComponentMgr.update(dt);
+		m_projectileComponentMgr.checkOffLimits();
 		checkCollisions();
+
+		m_timerEnemyShoot += dt;
+		if (m_timerEnemyShoot >= INTERVAL_ENEMIES_SHOOT) {
+			shootEnemy();
+			m_timerEnemyShoot = 0.0f;
+		}
 
 		draw();
 	}
@@ -119,15 +130,17 @@ void Game::draw()
 	textureRect.h = (int)Player::SIZE;  // the height of the texture
 	SDL_RenderCopy(m_renderer, texturePlayer, nullptr, &textureRect);
 
-	SDL_Texture* texturePlayerBullet = m_textureMgr.getTexture(TextureMgr::TextureID::PLAYER_BULLET);
+
+	SDL_Texture** textures = m_textureMgr.getTextures();
 	auto projectilePositions = m_projectileComponentMgr.getPositions();
+	auto textureIDs = m_projectileComponentMgr.getTextureIDs();
 	size_t numberProjectiles = m_projectileComponentMgr.getSize();
 	textureRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;  
 	textureRect.h = (int)ProjectileComponentMgr::PROJECTILE_SIZE;  
 	for (size_t i = 0; i < numberProjectiles; ++i) {
 		textureRect.x = (int)projectilePositions[i].x;
 		textureRect.y = (int)projectilePositions[i].y;
-		SDL_RenderCopy(m_renderer, texturePlayerBullet, nullptr, &textureRect);
+		SDL_RenderCopy(m_renderer, textures[textureIDs[i]], nullptr, &textureRect);
 	}
 	
 	SDL_RenderPresent(m_renderer);
@@ -166,13 +179,35 @@ void Game::shoot()
 {
 	if (m_playerProjectiles.size() < MAXIMUM_SHOTS_PLAYER) {
 		m_playerProjectiles.push_back(m_entityManager.create());
-		m_projectileComponentMgr.add(m_playerProjectiles.back(), m_player.getPosition(), -250.0f);
+		m_projectileComponentMgr.add(m_playerProjectiles.back(), m_player.getPosition(), -250.0f, TextureMgr::TextureID::PLAYER_BULLET);
 	}
+}
+
+void Game::shootEnemy()
+{
+	m_enemyProjectiles.push_back(m_entityManager.create());
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, static_cast<int>(m_enemies.size()) - 1);
+
+	m_projectileComponentMgr.add(m_enemyProjectiles.back(), 
+		m_enemyComponentMgr.getPosition(m_enemies[dis(gen)]), 
+		250.0f, 
+		TextureMgr::TextureID::ENEMY_BULLET);
 }
 
 void Game::destroyProjectile(Entity e)
 {
-	m_playerProjectiles.erase(std::find(m_playerProjectiles.begin(), m_playerProjectiles.end(), e));
+	auto it = std::find(m_playerProjectiles.begin(), m_playerProjectiles.end(), e);
+	if (it != m_playerProjectiles.end()) {
+		m_playerProjectiles.erase(it);
+	}
+	else {
+		auto it = std::find(m_enemyProjectiles.begin(), m_enemyProjectiles.end(), e);
+		if (it != m_enemyProjectiles.end()) {
+			m_enemyProjectiles.erase(it);
+		}
+	}
 	m_entityManager.destroy(e);
 }
 
@@ -190,6 +225,7 @@ void Game::checkCollisions()
 		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
 		Entity collided = m_enemyComponentMgr.checkShot(projectileRect);
 		if (collided.isValid()) {
+			m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
 			m_enemyComponentMgr.destroy(collided);
 			m_entityManager.destroy(collided);
 			m_projectileComponentMgr.destroy(projectileInstance);

@@ -38,8 +38,9 @@ private :
 public:
 	static const size_t ENEMY_SIZE;
 	//void add(const Entity& e) override;
-	inline vec3* const getPositions() { return m_data.position;  }
-	inline size_t const getSize() { return m_instanceCount;  }
+	inline vec3 getPosition(const Entity& e) const { return m_data.position[lookup(e).i];  }
+	inline vec3* const getPositions() const { return m_data.position;  }
+	inline size_t const getSize() const { return m_instanceCount;  }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 	
 	void add(const Entity& e, const vec3& position);

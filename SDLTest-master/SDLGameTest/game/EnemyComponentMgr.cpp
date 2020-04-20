@@ -6,7 +6,7 @@
 
 using namespace dodf;
 
-const size_t EnemyComponentMgr::ENEMY_SIZE = 30;
+const size_t EnemyComponentMgr::ENEMY_SIZE = 35;
 
 void EnemyComponentMgr::clean()
 {

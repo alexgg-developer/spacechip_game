@@ -35,7 +35,8 @@ private:
 	static const size_t ENEMY_COUNT = 110;
 	static const size_t WINDOW_WIDTH = 800;
 	static const size_t WINDOW_HEIGHT = 600;
-	const size_t MAXIMUM_SHOTS_PLAYER = 3;
+	static const size_t MAXIMUM_SHOTS_PLAYER = 3;
+	static const float INTERVAL_ENEMIES_SHOOT;
 
 	SDL_Renderer * m_renderer;
 	SDL_Window * m_window;
@@ -46,12 +47,14 @@ private:
 	//std::array<Entity, ENEMY_COUNT> m_enemies;
 	//std::vector<Entity> m_enemies;
 	std::vector<Entity> m_playerProjectiles;
-	Entity* m_enemies;
+	std::vector<Entity> m_enemyProjectiles;
+	std::vector<Entity> m_enemies;
 	Player m_player;
 	Input m_input;
 	Timer m_timer;
 	PlayerController m_playerController;
 	TextureMgr m_textureMgr;
+	float m_timerEnemyShoot;
 
 	void checkCollisions();
 	void destroyProjectile(Entity e);
@@ -59,4 +62,5 @@ private:
 	void initPlayer();
 	int initSDL();
 	void shoot();
+	void shootEnemy();
 };

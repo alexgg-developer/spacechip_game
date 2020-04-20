@@ -22,5 +22,6 @@ public:
 	bool isValid() { return id != NO_VALUE; }
 
 	friend bool operator== (const Entity &e1, const Entity &e2);
+	friend bool operator< (const Entity &e1, const Entity &e2);
 };
 
