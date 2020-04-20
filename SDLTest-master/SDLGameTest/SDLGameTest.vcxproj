@@ -100,7 +100,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>COPY $(SolutionDir)\Libraries\SDL2-2.0.10\lib\$(PlatformTarget)\*.dll $(TargetDir)\

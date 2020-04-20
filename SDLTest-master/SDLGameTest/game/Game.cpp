@@ -4,6 +4,7 @@
 
 #include "Vec.h"
 
+#include <algorithm>
 
 Game::Game(): m_playerController(m_player)
 {
@@ -29,7 +30,11 @@ int Game::init()
 	m_enemyComponentMgr.allocate(100u);
 	size_t projectileMax = 30u;
 	m_projectileComponentMgr.allocate(projectileMax);
-	m_projectiles.reserve(projectileMax);
+	m_projectileComponentMgr.setLimits(30.0f, static_cast<float>(WINDOW_HEIGHT) - 100.0f);
+	Entity e;
+	using std::placeholders::_1;
+	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
+	m_playerProjectiles.reserve(projectileMax);
 	initEnemies();
 	initPlayer();	
 	error = m_textureMgr.init(m_renderer);
@@ -85,6 +90,8 @@ void Game::run()
 		float dt = m_timer.getDeltaTime();
 		m_playerController.update(m_input, dt);		
 		m_projectileComponentMgr.update(dt);
+		checkCollisions();
+
 		draw();
 	}
 }
@@ -97,7 +104,8 @@ void Game::draw()
 	textureRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
 	textureRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
 	auto positions = m_enemyComponentMgr.getPositions();
-	for (size_t i = 0; i < ENEMY_COUNT; ++i) {
+	auto size = m_enemyComponentMgr.getSize();
+	for (size_t i = 0; i < size; ++i) {
 		textureRect.x = (int)positions[i].x;
 		textureRect.y = (int)positions[i].y;
 		SDL_RenderCopy(m_renderer, textureEnemy, nullptr, &textureRect);
@@ -156,6 +164,38 @@ int Game::initSDL()
 
 void Game::shoot()
 {
-	m_projectiles.push_back(m_entityManager.create());
-	m_projectileComponentMgr.add(m_projectiles.back(), m_player.getPosition(), -100.0f);
+	if (m_playerProjectiles.size() < MAXIMUM_SHOTS_PLAYER) {
+		m_playerProjectiles.push_back(m_entityManager.create());
+		m_projectileComponentMgr.add(m_playerProjectiles.back(), m_player.getPosition(), -250.0f);
+	}
 }
+
+void Game::destroyProjectile(Entity e)
+{
+	m_playerProjectiles.erase(std::find(m_playerProjectiles.begin(), m_playerProjectiles.end(), e));
+	m_entityManager.destroy(e);
+}
+
+void Game::checkCollisions()
+{
+	vec3* projectilePositions = m_projectileComponentMgr.getPositions();
+	//size_t numberProjectiles = m_projectileComponentMgr.getSize();
+	SDL_Rect projectileRect;
+	projectileRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
+	projectileRect.h = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
+	
+	for (intptr_t i = m_playerProjectiles.size() - 1; i >= 0; --i) {
+		Instance projectileInstance = m_projectileComponentMgr.lookup(m_playerProjectiles[i]);
+		projectileRect.x = (int)projectilePositions[projectileInstance.i].x;
+		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
+		Entity collided = m_enemyComponentMgr.checkShot(projectileRect);
+		if (collided.isValid()) {
+			m_enemyComponentMgr.destroy(collided);
+			m_entityManager.destroy(collided);
+			m_projectileComponentMgr.destroy(projectileInstance);
+			m_entityManager.destroy(m_playerProjectiles[i]);
+			m_playerProjectiles.erase(m_playerProjectiles.begin() + i);
+		}
+	}
+}
+

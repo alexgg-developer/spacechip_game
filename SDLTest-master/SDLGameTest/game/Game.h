@@ -35,6 +35,7 @@ private:
 	static const size_t ENEMY_COUNT = 110;
 	static const size_t WINDOW_WIDTH = 800;
 	static const size_t WINDOW_HEIGHT = 600;
+	const size_t MAXIMUM_SHOTS_PLAYER = 3;
 
 	SDL_Renderer * m_renderer;
 	SDL_Window * m_window;
@@ -44,7 +45,7 @@ private:
 	ProjectileComponentMgr m_projectileComponentMgr;
 	//std::array<Entity, ENEMY_COUNT> m_enemies;
 	//std::vector<Entity> m_enemies;
-	std::vector<Entity> m_projectiles;
+	std::vector<Entity> m_playerProjectiles;
 	Entity* m_enemies;
 	Player m_player;
 	Input m_input;
@@ -52,8 +53,10 @@ private:
 	PlayerController m_playerController;
 	TextureMgr m_textureMgr;
 
-	void initPlayer();
+	void checkCollisions();
+	void destroyProjectile(Entity e);
 	void initEnemies();
+	void initPlayer();
 	int initSDL();
 	void shoot();
 };

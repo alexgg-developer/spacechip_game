@@ -17,9 +17,8 @@ private:
 	std::vector<uint8_t> _generation;
 	std::deque<uint32_t> _free_indices;
 public:
-	EntityManager(): _free_indices(MINIMUM_FREE_INDICES, 0)
+	EntityManager()
 	{
-		
 	}
 	Entity create()
 	{
