@@ -55,7 +55,8 @@ private:
 	TextureMgr m_textureMgr;
 	float m_timerEnemyShoot;
 
-	void checkCollisions();
+	void checkCollisionsPlayerProjectile();
+	void checkCollisionsEnemyProjectiles();
 	void destroyProjectile(Entity e);
 	void initEnemies();
 	void initPlayer();

@@ -85,7 +85,7 @@ void Game::initObstacles()
 	const size_t OBSTACLE_MULTIPLIER = 2u;
 	constexpr size_t HORIZONTAL_MARGIN = 70u;
 	const size_t TOP_MARGIN = 90u;
-	const size_t BOTTOM_MARGIN = WINDOW_HEIGHT - TOP_MARGIN * 2u;
+	constexpr size_t BOTTOM_MARGIN = WINDOW_HEIGHT - TOP_MARGIN * 2u;
 	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
 
 	size_t obstacleCount = OBSTACLE_COUNT;
@@ -93,13 +93,13 @@ void Game::initObstacles()
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
 	std::uniform_int_distribution<> horizontalDis(HORIZONTAL_MARGIN, WINDOW_WIDTH - HORIZONTAL_MARGIN);
-	std::uniform_int_distribution<> topDis(TOP_MARGIN, WINDOW_HEIGHT - TOP_MARGIN);
+	std::uniform_int_distribution<> verticalDis(TOP_MARGIN, BOTTOM_MARGIN);
 	//constexpr size_t HORIZONTAL_SPACE = WINDOW_WIDTH - HORIZONTAL_MARGIN * 2u;
 	for (size_t i = 0; i < obstacleCount; ++i) {
 		Entity obstacle = m_entityManager.create();
 		vec3 position;
 		position.x = static_cast<float>(horizontalDis(gen));
-		position.y = static_cast<float>(topDis(gen));
+		position.y = static_cast<float>(verticalDis(gen));
 		position.z = 0.0f;
 		m_obstacleComponentMgr.add(obstacle, position);
 	}
@@ -131,7 +131,8 @@ void Game::run()
 		m_projectileComponentMgr.checkOffLimits();
 		m_enemyComponentMgr.update(dt);
 		m_enemyComponentMgr.checkLimits();
-		checkCollisions();
+		checkCollisionsPlayerProjectile();
+		checkCollisionsEnemyProjectiles();
 
 		m_timerEnemyShoot += dt;
 		if (m_timerEnemyShoot >= INTERVAL_ENEMIES_SHOOT) {
@@ -259,7 +260,7 @@ void Game::destroyProjectile(Entity e)
 	m_entityManager.destroy(e);
 }
 
-void Game::checkCollisions()
+void Game::checkCollisionsPlayerProjectile()
 {
 	vec3* projectilePositions = m_projectileComponentMgr.getPositions();
 	//size_t numberProjectiles = m_projectileComponentMgr.getSize();
@@ -290,6 +291,33 @@ void Game::checkCollisions()
 				m_entityManager.destroy(m_playerProjectiles[i]);
 				m_playerProjectiles.erase(m_playerProjectiles.begin() + i);
 			}
+		}
+	}
+}
+
+
+void Game::checkCollisionsEnemyProjectiles()
+{
+	vec3* projectilePositions = m_projectileComponentMgr.getPositions();
+	SDL_Rect projectileRect, playerRect;
+	playerRect.x = (int)m_player.getPosition().x;
+	playerRect.y = (int)m_player.getPosition().y;
+	playerRect.w = (int)Player::SIZE;  // the width of the texture
+	playerRect.h = (int)Player::SIZE;  // the height of the texture
+
+	projectileRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
+	projectileRect.h = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
+
+	for (intptr_t i = m_enemyProjectiles.size() - 1; i >= 0; --i) {
+		Instance projectileInstance = m_projectileComponentMgr.lookup(m_enemyProjectiles[i]);
+		projectileRect.x = (int)projectilePositions[projectileInstance.i].x;
+		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
+		if (SDL_HasIntersection(&projectileRect, &playerRect)) {
+			m_player.setLife(m_player.getLife() - 1);
+			std::cout << "player life down::" << m_player.getLife() << std::endl;
+			m_projectileComponentMgr.destroy(projectileInstance);
+			m_entityManager.destroy(m_enemyProjectiles[i]);
+			m_enemyProjectiles.pop_back();
 		}
 	}
 }

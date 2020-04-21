@@ -16,14 +16,18 @@ using namespace std;
 class Player  
 {
 private :
-	size_t m_life = 3;
+	int32_t m_life = 3;
 	vec3 m_position;
 	float m_speed = 160.0f;
 
 public:
 	static const size_t SIZE; //pixels width and height
-	vec3 getPosition() { return m_position;  }	
-	float getSpeed() { return m_speed; }
+
+	inline vec3 getPosition() { return m_position;  }	
+	inline float getSpeed() { return m_speed; }
+	inline int32_t getLife() { return m_life; }
+	void setLife(int32_t life);
+
 	void setPosition(const vec3& newPosition);
 	
 };
