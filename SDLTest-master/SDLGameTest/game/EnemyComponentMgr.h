@@ -26,18 +26,18 @@ class EnemyComponentMgr
 private :
 	struct InstanceData {
 		size_t* life;
-		//glm::vec3* position;
 		Entity* entity;
 		vec3* position;
 	};
-
+	
+	float m_speed, m_leftLimit, m_rightLimit;
 	InstanceData m_data;
 	size_t m_instanceCount;
 	unordered_map<uint32_t, Instance> m_map;
 
 public:
 	static const size_t ENEMY_SIZE;
-	//void add(const Entity& e) override;
+
 	inline vec3 getPosition(const Entity& e) const { return m_data.position[lookup(e).i];  }
 	inline vec3* const getPositions() const { return m_data.position;  }
 	inline size_t const getSize() const { return m_instanceCount;  }
@@ -46,8 +46,12 @@ public:
 	void add(const Entity& e, const vec3& position);
 	//void allocate(size_t size) override;
 	void allocate(size_t size);
+	void checkLimits();
 	Entity checkShot(const SDL_Rect& rect);
 	void clean();
 	void destroy(const Entity& e);
+	void setLimits(float leftLimit, float rightLimit);
+	void setSpeed(float speed);
+	void update(float dt);
 };
 

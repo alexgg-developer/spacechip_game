@@ -50,15 +50,17 @@ int Game::init()
 
 void Game::initEnemies()
 {
+	constexpr size_t NUMBER_ROWS = 5u;
+	constexpr size_t NUMBER_COLUMNS = 17u;
+	constexpr size_t ENEMY_COUNT = NUMBER_COLUMNS * NUMBER_ROWS;
 	m_enemyComponentMgr.allocate(ENEMY_COUNT);
 	m_enemies.reserve(ENEMY_COUNT);
-	const size_t NUMBER_ROWS = 5u;
-	const size_t NUMBER_COLUMNS = (ENEMY_COUNT / NUMBER_ROWS);
-	const size_t LEFT_MARGIN = 70u;
+	//const size_t LEFT_MARGIN = 70u;
 	const size_t TOP_MARGIN = 90u;
-	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
+	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE; //35
 	const size_t HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3u;
 	const size_t VERTICAL_MARGIN_BETWEEN_ENEMIES = 3u;
+	const size_t LEFT_MARGIN = (WINDOW_WIDTH - NUMBER_COLUMNS * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES)) / 2u;
 	for (size_t i = 0; i < ENEMY_COUNT; ++i) {
 		m_enemies.push_back(m_entityManager.create());
 		vec3 position;
@@ -70,6 +72,9 @@ void Game::initEnemies()
 		position.z = 0.0f;
 		m_enemyComponentMgr.add(m_enemies[i], position);
 	}		
+	const size_t HORIZONTAL_LIMIT = 5u;
+	m_enemyComponentMgr.setLimits((float)HORIZONTAL_LIMIT, (float)(WINDOW_WIDTH - HORIZONTAL_LIMIT - ENEMY_SIZE));
+	m_enemyComponentMgr.setSpeed(25.0f);
 }
 
 void Game::initObstacles()
@@ -78,14 +83,10 @@ void Game::initObstacles()
 
 	const size_t OBSTACLE_COUNT = 1u;
 	const size_t OBSTACLE_MULTIPLIER = 2u;
-	const size_t NUMBER_ROWS = 5u;
-	const size_t NUMBER_COLUMNS = (ENEMY_COUNT / NUMBER_ROWS);
 	constexpr size_t HORIZONTAL_MARGIN = 70u;
 	const size_t TOP_MARGIN = 90u;
-	const size_t BOTTOM_MARGIN = WINDOW_HEIGHT - TOP_MARGIN;
+	const size_t BOTTOM_MARGIN = WINDOW_HEIGHT - TOP_MARGIN * 2u;
 	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
-	const size_t HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3u;
-	const size_t VERTICAL_MARGIN_BETWEEN_ENEMIES = 3u;
 
 	size_t obstacleCount = OBSTACLE_COUNT;
 
@@ -128,6 +129,8 @@ void Game::run()
 		m_playerController.update(m_input, dt);		
 		m_projectileComponentMgr.update(dt);
 		m_projectileComponentMgr.checkOffLimits();
+		m_enemyComponentMgr.update(dt);
+		m_enemyComponentMgr.checkLimits();
 		checkCollisions();
 
 		m_timerEnemyShoot += dt;

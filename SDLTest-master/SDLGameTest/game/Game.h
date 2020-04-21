@@ -33,7 +33,6 @@ public:
 	void run();
 
 private:
-	static const size_t ENEMY_COUNT = 110;
 	static constexpr size_t WINDOW_WIDTH = 800u;
 	static constexpr size_t WINDOW_HEIGHT = 600u;
 	static const size_t MAXIMUM_SHOTS_PLAYER = 3;

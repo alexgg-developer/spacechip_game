@@ -3,10 +3,11 @@
 
 #include "EnemyComponentMgr.h"
 
+#include <cmath>
 
 using namespace dodf;
 
-const size_t EnemyComponentMgr::ENEMY_SIZE = 35;
+const size_t EnemyComponentMgr::ENEMY_SIZE = 36;
 
 void EnemyComponentMgr::clean()
 {
@@ -31,7 +32,18 @@ void EnemyComponentMgr::destroy(const Entity & e)
 	--m_instanceCount;
 }
 
-Entity EnemyComponentMgr::checkShot(const SDL_Rect & rect)
+void EnemyComponentMgr::setSpeed(float speed)
+{
+	m_speed = speed;
+}
+
+void EnemyComponentMgr::setLimits(float leftLimit, float rightLimit)
+{
+	m_leftLimit = leftLimit;
+	m_rightLimit = rightLimit;
+}
+
+Entity EnemyComponentMgr::checkShot(const SDL_Rect& rect)
 {
 	Entity entityShot;
 	SDL_Rect textureRect;
@@ -68,4 +80,32 @@ void EnemyComponentMgr::add(const Entity& e, const vec3& position)
 	m_data.entity[instance.i] = e;
 	++m_instanceCount;
 }
+
+void EnemyComponentMgr::update(float dt)
+{
+	for (size_t i = 0; i < m_instanceCount; ++i) {
+		m_data.position[i].x += m_speed * dt;
+	}
+}
+
+void EnemyComponentMgr::checkLimits()
+{
+	bool hasToMoveDown = false;
+	for (size_t i = 0; i < m_instanceCount; ++i) {
+		if (m_data.position[i].x < m_leftLimit || m_data.position[i].x > m_rightLimit) {
+			hasToMoveDown = true;
+			break;
+		}
+	}
+
+	if (hasToMoveDown) {
+		m_speed = -m_speed;
+		float enemySize = (float)ENEMY_SIZE;
+		for (size_t i = 0; i < m_instanceCount; ++i) {
+			m_data.position[i].y += enemySize * 0.3f;
+			m_data.position[i].x += enemySize * 0.1f * copysignf(1.0f, m_speed);
+		}
+	}
+}
+
 
