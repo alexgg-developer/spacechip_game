@@ -57,6 +57,7 @@ private:
 
 	void checkCollisionsPlayerProjectile();
 	void checkCollisionsEnemyProjectiles();
+	void checkCollissionsEnemyWithPlayer();
 	void destroyProjectile(Entity e);
 	void initEnemies();
 	void initPlayer();

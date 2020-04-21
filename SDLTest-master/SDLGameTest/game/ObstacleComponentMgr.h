@@ -2,6 +2,7 @@
 
 #include "Vec.h"
 
+#include "../dodf/Assert.h"
 #include "../dodf/Instance.h"
 #include "../dodf/Entity.h"
 
@@ -24,7 +25,7 @@ class ObstacleComponentMgr
 {
 private :
 	struct InstanceData {
-		size_t* life;
+		int32_t* life;
 		Entity* entity;
 		vec3* position;
 	};
@@ -37,6 +38,7 @@ private :
 public:
 	static const size_t OBSTACLE_SIZE;
 	
+	inline int32_t getLife(Instance i) { ASSERT(i.i < m_instanceCount); return m_data.life[i.i]; }
 	inline vec3 getPosition(const Entity& e) const { return m_data.position[lookup(e).i];  }
 	inline vec3* const getPositions() const { return m_data.position;  }
 	inline size_t const getSize() const { return m_instanceCount;  }
@@ -48,5 +50,6 @@ public:
 	void clean();
 	void destroy(const Entity& e);
 	void setDestroyCallback(std::function <void(Entity)> callback);
+	void setLife(Instance i, int32_t life);
 };
 

@@ -31,6 +31,7 @@ void ObstacleComponentMgr::destroy(const Entity & e)
 	--m_instanceCount;
 }
 
+
 Entity ObstacleComponentMgr::checkShot(const SDL_Rect & rect)
 {
 	Entity entityShot;
@@ -52,7 +53,7 @@ Entity ObstacleComponentMgr::checkShot(const SDL_Rect & rect)
 
 void ObstacleComponentMgr::allocate(size_t size)
 {
-	m_data.life = static_cast<size_t*>(MemoryPool::Get(size * sizeof(size_t)));
+	m_data.life = static_cast<int32_t*>(MemoryPool::Get(size * sizeof(int32_t)));
 	m_data.position = static_cast<vec3*>(MemoryPool::Get(size * sizeof(vec3)));
 	m_data.entity = static_cast<Entity*>(MemoryPool::Get(size * sizeof(Entity)));
 
@@ -73,4 +74,10 @@ void ObstacleComponentMgr::add(const Entity& e, const vec3& position)
 void ObstacleComponentMgr::setDestroyCallback(std::function<void(Entity)> callback)
 {
 	m_destroyCallback = callback;
+}
+
+void ObstacleComponentMgr::setLife(Instance i, int32_t life)
+{
+	ASSERT(i.i < m_instanceCount); 
+	m_data.life[i.i] = life;
 }

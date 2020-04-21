@@ -30,7 +30,6 @@ int Game::init()
 	if (error) return error;
 	size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
 	dodf::MemoryPool::Initialize(initSize);
-	m_enemyComponentMgr.allocate(100u);
 	size_t projectileMax = 30u;
 	m_projectileComponentMgr.allocate(projectileMax);
 	//y = 0 on top
@@ -50,6 +49,9 @@ int Game::init()
 
 void Game::initEnemies()
 {
+	m_enemyComponentMgr.allocate(100u);
+	m_enemyComponentMgr.setLimitReachedCallback(std::bind(&Game::checkCollissionsEnemyWithPlayer, this));
+
 	constexpr size_t NUMBER_ROWS = 5u;
 	constexpr size_t NUMBER_COLUMNS = 17u;
 	constexpr size_t ENEMY_COUNT = NUMBER_COLUMNS * NUMBER_ROWS;
@@ -75,6 +77,7 @@ void Game::initEnemies()
 	const size_t HORIZONTAL_LIMIT = 5u;
 	m_enemyComponentMgr.setLimits((float)HORIZONTAL_LIMIT, (float)(WINDOW_WIDTH - HORIZONTAL_LIMIT - ENEMY_SIZE));
 	m_enemyComponentMgr.setSpeed(25.0f);
+	//m_enemyComponentMgr.setSpeed(225.0f);
 }
 
 void Game::initObstacles()
@@ -275,8 +278,16 @@ void Game::checkCollisionsPlayerProjectile()
 
 		Entity collided = m_obstacleComponentMgr.checkShot(projectileRect);
 		if (collided.isValid()) {
-			m_obstacleComponentMgr.destroy(collided);
-			m_entityManager.destroy(collided);
+			Instance obstacleInstance = m_obstacleComponentMgr.lookup(collided);
+			auto life = m_obstacleComponentMgr.getLife(obstacleInstance) - 1;
+			if (life != 0) {
+				m_obstacleComponentMgr.setLife(obstacleInstance, life);				
+			}
+			else {
+				m_obstacleComponentMgr.destroy(collided);
+				m_entityManager.destroy(collided);
+			}
+
 			m_projectileComponentMgr.destroy(projectileInstance);
 			m_entityManager.destroy(m_playerProjectiles[i]);
 			m_playerProjectiles.erase(m_playerProjectiles.begin() + i);
@@ -284,9 +295,16 @@ void Game::checkCollisionsPlayerProjectile()
 		else {
 			collided = m_enemyComponentMgr.checkShot(projectileRect);
 			if (collided.isValid()) {
-				m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
-				m_enemyComponentMgr.destroy(collided);
-				m_entityManager.destroy(collided);
+				Instance enemyInstance = m_enemyComponentMgr.lookup(collided);
+				auto life = m_enemyComponentMgr.getLife(enemyInstance) - 1;
+				if (life != 0) {
+					m_enemyComponentMgr.setLife(enemyInstance, life);
+				}
+				else {
+					m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
+					m_enemyComponentMgr.destroy(collided);
+					m_entityManager.destroy(collided);
+				}
 				m_projectileComponentMgr.destroy(projectileInstance);
 				m_entityManager.destroy(m_playerProjectiles[i]);
 				m_playerProjectiles.erase(m_playerProjectiles.begin() + i);
@@ -318,6 +336,30 @@ void Game::checkCollisionsEnemyProjectiles()
 			m_projectileComponentMgr.destroy(projectileInstance);
 			m_entityManager.destroy(m_enemyProjectiles[i]);
 			m_enemyProjectiles.pop_back();
+		}
+	}
+}
+
+void Game::checkCollissionsEnemyWithPlayer()
+{
+	vec3* enemyPositions = m_enemyComponentMgr.getPositions();
+	size_t enemyInstances = m_enemyComponentMgr.getSize();
+	SDL_Rect enemyRect, playerRect;
+	playerRect.x = (int)m_player.getPosition().x;
+	playerRect.y = (int)m_player.getPosition().y;
+	playerRect.w = (int)Player::SIZE;  // the width of the texture
+	playerRect.h = (int)Player::SIZE;  // the height of the texture
+
+	enemyRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;
+	enemyRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;
+
+	for (size_t i = 0; i < enemyInstances; ++i) {
+		enemyRect.x = (int)enemyPositions[i].x;
+		enemyRect.y = (int)enemyPositions[i].y;
+		if (SDL_HasIntersection(&enemyRect, &playerRect)) {
+			m_player.setLife(0);			
+			std::cout << "game over" << std::endl;
+			break;
 		}
 	}
 }
