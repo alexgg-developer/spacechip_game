@@ -158,6 +158,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClCompile Include="dodf\MemoryPool.cpp" />
     <ClCompile Include="game\Game.cpp" />
     <ClCompile Include="game\Input.cpp" />
+    <ClCompile Include="game\ObstacleComponentMgr.cpp" />
     <ClCompile Include="game\Player.cpp" />
     <ClCompile Include="game\PlayerController.cpp" />
     <ClCompile Include="game\ProjectileComponentMgr.cpp" />
@@ -174,6 +175,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClInclude Include="dodf\MemoryPool.h" />
     <ClInclude Include="game\Game.h" />
     <ClInclude Include="game\Input.h" />
+    <ClInclude Include="game\ObstacleComponentMgr.h" />
     <ClInclude Include="game\Player.h" />
     <ClInclude Include="game\PlayerController.h" />
     <ClInclude Include="game\ProjectileComponentMgr.h" />

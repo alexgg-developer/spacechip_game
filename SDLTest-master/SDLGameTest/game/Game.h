@@ -13,6 +13,7 @@
 
 #include "EnemyComponentMgr.h"
 #include "ProjectileComponentMgr.h"
+#include "ObstacleComponentMgr.h"
 #include "Player.h"
 #include "Input.h"
 #include "Timer.h"
@@ -33,8 +34,8 @@ public:
 
 private:
 	static const size_t ENEMY_COUNT = 110;
-	static const size_t WINDOW_WIDTH = 800;
-	static const size_t WINDOW_HEIGHT = 600;
+	static constexpr size_t WINDOW_WIDTH = 800u;
+	static constexpr size_t WINDOW_HEIGHT = 600u;
 	static const size_t MAXIMUM_SHOTS_PLAYER = 3;
 	static const float INTERVAL_ENEMIES_SHOOT;
 
@@ -43,9 +44,8 @@ private:
 
 	EntityManager m_entityManager;
 	EnemyComponentMgr m_enemyComponentMgr;
-	ProjectileComponentMgr m_projectileComponentMgr;
-	//std::array<Entity, ENEMY_COUNT> m_enemies;
-	//std::vector<Entity> m_enemies;
+	ObstacleComponentMgr m_obstacleComponentMgr;
+	ProjectileComponentMgr m_projectileComponentMgr;	
 	std::vector<Entity> m_playerProjectiles;
 	std::vector<Entity> m_enemyProjectiles;
 	std::vector<Entity> m_enemies;
@@ -60,6 +60,7 @@ private:
 	void destroyProjectile(Entity e);
 	void initEnemies();
 	void initPlayer();
+	void initObstacles();
 	int initSDL();
 	void shoot();
 	void shootEnemy();

@@ -21,8 +21,6 @@ void TextureMgr::clean()
 
 int TextureMgr::init(SDL_Renderer* const renderer)
 {
-	//*textures = static_cast<SDL_Texture*>(MemoryPool::Get(TextureID::SIZE * sizeof(SDL_Texture*)));
-	//textures[0] = static_cast<SDL_Texture*>(MemoryPool::Get(TextureID::SIZE * sizeof(SDL_Texture*)));
 	m_textures = static_cast<SDL_Texture**>(MemoryPool::Get(TextureID::SIZE * sizeof(SDL_Texture*)));
 
 	//auto texture = *textures;
@@ -31,6 +29,7 @@ int TextureMgr::init(SDL_Renderer* const renderer)
 	error += loadTexture(PLAYER, "Assets/Player/spaceship.png", renderer);
 	error += loadTexture(PLAYER_BULLET, "Assets/Player/bullet.png", renderer);
 	error += loadTexture(ENEMY_BULLET, "Assets/Enemy/bullet_enemy.png", renderer);
+	error += loadTexture(OBSTACLE, "Assets/Aestroids/aestroid_brown.png", renderer);
 
 	return error;
 }

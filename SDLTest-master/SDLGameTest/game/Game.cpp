@@ -40,6 +40,7 @@ int Game::init()
 	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
 	m_playerProjectiles.reserve(projectileMax);
 	initEnemies();
+	initObstacles();
 	initPlayer();	
 	error = m_textureMgr.init(m_renderer);
 	if (error) return error;
@@ -69,6 +70,38 @@ void Game::initEnemies()
 		position.z = 0.0f;
 		m_enemyComponentMgr.add(m_enemies[i], position);
 	}		
+}
+
+void Game::initObstacles()
+{
+	m_obstacleComponentMgr.allocate(50u);
+
+	const size_t OBSTACLE_COUNT = 1u;
+	const size_t OBSTACLE_MULTIPLIER = 2u;
+	const size_t NUMBER_ROWS = 5u;
+	const size_t NUMBER_COLUMNS = (ENEMY_COUNT / NUMBER_ROWS);
+	constexpr size_t HORIZONTAL_MARGIN = 70u;
+	const size_t TOP_MARGIN = 90u;
+	const size_t BOTTOM_MARGIN = WINDOW_HEIGHT - TOP_MARGIN;
+	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
+	const size_t HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3u;
+	const size_t VERTICAL_MARGIN_BETWEEN_ENEMIES = 3u;
+
+	size_t obstacleCount = OBSTACLE_COUNT;
+
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> horizontalDis(HORIZONTAL_MARGIN, WINDOW_WIDTH - HORIZONTAL_MARGIN);
+	std::uniform_int_distribution<> topDis(TOP_MARGIN, WINDOW_HEIGHT - TOP_MARGIN);
+	//constexpr size_t HORIZONTAL_SPACE = WINDOW_WIDTH - HORIZONTAL_MARGIN * 2u;
+	for (size_t i = 0; i < obstacleCount; ++i) {
+		Entity obstacle = m_entityManager.create();
+		vec3 position;
+		position.x = static_cast<float>(horizontalDis(gen));
+		position.y = static_cast<float>(topDis(gen));
+		position.z = 0.0f;
+		m_obstacleComponentMgr.add(obstacle, position);
+	}
 }
 
 void Game::initPlayer()
@@ -110,6 +143,7 @@ void Game::run()
 void Game::draw()
 {
 	SDL_RenderClear(m_renderer);
+
 	SDL_Texture* textureEnemy = m_textureMgr.getTexture(TextureMgr::TextureID::ENEMY);
 	SDL_Rect textureRect;
 	textureRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
@@ -143,6 +177,17 @@ void Game::draw()
 		SDL_RenderCopy(m_renderer, textures[textureIDs[i]], nullptr, &textureRect);
 	}
 	
+	SDL_Texture* textureObstacle = m_textureMgr.getTexture(TextureMgr::TextureID::OBSTACLE);
+	textureRect.w = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the width of the texture
+	textureRect.h = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the height of the texture
+	positions = m_obstacleComponentMgr.getPositions();
+	size = m_obstacleComponentMgr.getSize();
+	for (size_t i = 0; i < size; ++i) {
+		textureRect.x = (int)positions[i].x;
+		textureRect.y = (int)positions[i].y;
+		SDL_RenderCopy(m_renderer, textureObstacle, nullptr, &textureRect);
+	}
+
 	SDL_RenderPresent(m_renderer);
 }
 
@@ -223,14 +268,25 @@ void Game::checkCollisions()
 		Instance projectileInstance = m_projectileComponentMgr.lookup(m_playerProjectiles[i]);
 		projectileRect.x = (int)projectilePositions[projectileInstance.i].x;
 		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
-		Entity collided = m_enemyComponentMgr.checkShot(projectileRect);
+
+		Entity collided = m_obstacleComponentMgr.checkShot(projectileRect);
 		if (collided.isValid()) {
-			m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
-			m_enemyComponentMgr.destroy(collided);
+			m_obstacleComponentMgr.destroy(collided);
 			m_entityManager.destroy(collided);
 			m_projectileComponentMgr.destroy(projectileInstance);
 			m_entityManager.destroy(m_playerProjectiles[i]);
 			m_playerProjectiles.erase(m_playerProjectiles.begin() + i);
+		}
+		else {
+			collided = m_enemyComponentMgr.checkShot(projectileRect);
+			if (collided.isValid()) {
+				m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
+				m_enemyComponentMgr.destroy(collided);
+				m_entityManager.destroy(collided);
+				m_projectileComponentMgr.destroy(projectileInstance);
+				m_entityManager.destroy(m_playerProjectiles[i]);
+				m_playerProjectiles.erase(m_playerProjectiles.begin() + i);
+			}
 		}
 	}
 }

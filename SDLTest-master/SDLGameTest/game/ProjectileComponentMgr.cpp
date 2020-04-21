@@ -44,10 +44,6 @@ void ProjectileComponentMgr::checkOffLimits()
 		}
 	}
 }
-/*float ProjectileComponentMgr::getProjectileSpeed()
-{
-	return m_projectileSpeed;
-}*/
 
 void ProjectileComponentMgr::destroy(const Entity & e)
 {

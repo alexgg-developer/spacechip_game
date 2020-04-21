@@ -1,19 +1,19 @@
 #include "../dodf/MemoryPool.h"
 #include "../dodf/Assert.h"
 
-#include "EnemyComponentMgr.h"
+#include "ObstacleComponentMgr.h"
 
 
 using namespace dodf;
 
-const size_t EnemyComponentMgr::ENEMY_SIZE = 35;
+const size_t ObstacleComponentMgr::OBSTACLE_SIZE = 55;
 
-void EnemyComponentMgr::clean()
+void ObstacleComponentMgr::clean()
 {
 
 }
 
-void EnemyComponentMgr::destroy(const Entity & e)
+void ObstacleComponentMgr::destroy(const Entity & e)
 {
 	size_t last = m_instanceCount - 1;
 	auto index = e.index();
@@ -31,12 +31,12 @@ void EnemyComponentMgr::destroy(const Entity & e)
 	--m_instanceCount;
 }
 
-Entity EnemyComponentMgr::checkShot(const SDL_Rect & rect)
+Entity ObstacleComponentMgr::checkShot(const SDL_Rect & rect)
 {
 	Entity entityShot;
 	SDL_Rect textureRect;
-	textureRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
-	textureRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
+	textureRect.w = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the width of the texture
+	textureRect.h = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the height of the texture
 	for (size_t i = 0; i < m_instanceCount; ++i) {
 		textureRect.x = (int)m_data.position[i].x;
 		textureRect.y = (int)m_data.position[i].y;
@@ -50,7 +50,7 @@ Entity EnemyComponentMgr::checkShot(const SDL_Rect & rect)
 }
 
 
-void EnemyComponentMgr::allocate(size_t size)
+void ObstacleComponentMgr::allocate(size_t size)
 {
 	m_data.life = static_cast<size_t*>(MemoryPool::Get(size * sizeof(size_t)));
 	m_data.position = static_cast<vec3*>(MemoryPool::Get(size * sizeof(vec3)));
@@ -59,13 +59,18 @@ void EnemyComponentMgr::allocate(size_t size)
 	m_instanceCount = 0;
 }
 
-void EnemyComponentMgr::add(const Entity& e, const vec3& position)
+void ObstacleComponentMgr::add(const Entity& e, const vec3& position)
 {
 	auto instance = Instance::create(m_instanceCount);
 	m_map[e.index()] = instance;
-	m_data.life[instance.i] = rand() % 3u + 1u;
+	m_data.life[instance.i] = rand() % 5u + 1u;
 	m_data.position[instance.i] = position;
 	m_data.entity[instance.i] = e;
+
 	++m_instanceCount;
 }
 
+void ObstacleComponentMgr::setDestroyCallback(std::function<void(Entity)> callback)
+{
+	m_destroyCallback = callback;
+}

@@ -23,7 +23,7 @@ public:
 		PLAYER,
 		PLAYER_BULLET,		
 		ENEMY_BULLET,
-		/*OBSTACLE,*/
+		OBSTACLE,
 		SIZE
 	};
 
