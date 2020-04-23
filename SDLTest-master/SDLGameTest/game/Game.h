@@ -14,6 +14,7 @@
 #include "EnemyComponentMgr.h"
 #include "ProjectileComponentMgr.h"
 #include "ObstacleComponentMgr.h"
+#include "TextComponentMgr.h"
 #include "Player.h"
 #include "Input.h"
 #include "Timer.h"
@@ -45,9 +46,11 @@ private:
 	EnemyComponentMgr m_enemyComponentMgr;
 	ObstacleComponentMgr m_obstacleComponentMgr;
 	ProjectileComponentMgr m_projectileComponentMgr;	
+	TextComponentMgr m_textComponentMgr;
 	std::vector<Entity> m_playerProjectiles;
 	std::vector<Entity> m_enemyProjectiles;
 	std::vector<Entity> m_enemies;
+	Entity m_maxScoreText, m_currentScoreText, m_lifeText;
 	Player m_player;
 	Input m_input;
 	Timer m_timer;
@@ -63,6 +66,7 @@ private:
 	void initPlayer();
 	void initObstacles();
 	int initSDL();
+	void initUI();
 	void shoot();
 	void shootEnemy();
 };

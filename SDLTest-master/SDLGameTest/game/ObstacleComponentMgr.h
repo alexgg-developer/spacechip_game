@@ -6,7 +6,6 @@
 #include "../dodf/Instance.h"
 #include "../dodf/Entity.h"
 
-//#include <glm/glm.hpp>
 
 #include <unordered_map>
 #include <functional>

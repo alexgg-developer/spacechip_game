@@ -34,7 +34,6 @@ public:
 	int init(SDL_Renderer* const renderer);
 
 private:
-	//size_t* internalIds;
 	SDL_Texture** m_textures;
 
 	int loadTexture(TextureID textureID, std::string path, SDL_Renderer* const renderer);

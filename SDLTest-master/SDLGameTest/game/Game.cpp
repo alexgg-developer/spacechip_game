@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <random>
+#include <string>
 
 const float Game::INTERVAL_ENEMIES_SHOOT = 2.0f;
 
@@ -17,6 +18,7 @@ Game::Game(): m_playerController(m_player), m_timerEnemyShoot(0.0f)
 Game::~Game()
 {
 	m_textureMgr.clean();
+	m_textComponentMgr.clean();
 	SDL_DestroyRenderer(m_renderer);
 	SDL_DestroyWindow(m_window);
 	SDL_Quit();
@@ -28,19 +30,19 @@ int Game::init()
 	int error = 0;
 	error += initSDL();
 	if (error) return error;
-	size_t initSize = 1 * 1024 * 1024 * 1024; //1GB
+	size_t initSize = 512 * 1024 * 1024; //512MB
 	dodf::MemoryPool::Initialize(initSize);
-	size_t projectileMax = 30u;
-	m_projectileComponentMgr.allocate(projectileMax);
+	const size_t PROJECTILE_MAX = 30u;
+	m_projectileComponentMgr.allocate(PROJECTILE_MAX);
 	//y = 0 on top
 	m_projectileComponentMgr.setLimits(static_cast<float>(WINDOW_HEIGHT) - 30.0f, 30.0f);
-	Entity e;
 	using std::placeholders::_1;
 	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
-	m_playerProjectiles.reserve(projectileMax);
+	m_playerProjectiles.reserve(PROJECTILE_MAX);
 	initEnemies();
 	initObstacles();
-	initPlayer();	
+	initPlayer();
+	initUI();
 	error = m_textureMgr.init(m_renderer);
 	if (error) return error;
 
@@ -195,6 +197,19 @@ void Game::draw()
 		SDL_RenderCopy(m_renderer, textureObstacle, nullptr, &textureRect);
 	}
 
+	SDL_Texture** textTextures = m_textComponentMgr.getTextures();
+	vec2* positions_ = m_textComponentMgr.getPositions();
+	size = m_textComponentMgr.getSize();
+	uint32_t* width = m_textComponentMgr.getWidths();
+	uint32_t* height = m_textComponentMgr.getHeights();
+	for (size_t i = 0; i < size; ++i) {
+		textureRect.x = (int)positions_[i].x;
+		textureRect.y = (int)positions_[i].y;
+		textureRect.w = (int)width[i];  // the width of the texture
+		textureRect.h = (int)height[i];  // the height of the texture
+		SDL_RenderCopy(m_renderer, textTextures[i], nullptr, &textureRect);
+	}
+
 	SDL_RenderPresent(m_renderer);
 }
 
@@ -224,7 +239,32 @@ int Game::initSDL()
 		return 1;
 	}
 
+	//Initialize SDL_ttf
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+		return 1;
+	}
+
 	return 0;
+}
+
+void Game::initUI()
+{
+	const size_t TEXT_MAX = 30u;
+	m_textComponentMgr.init(TEXT_MAX);
+
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ 20u, 10u }, "Score: ", m_renderer);
+	m_currentScoreText = m_entityManager.create();
+	m_textComponentMgr.add(m_currentScoreText, vec2{ 110u, 10u }, "100", m_renderer);
+
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH - 225u, 10 }, "Max score: ", m_renderer);
+	m_maxScoreText = m_entityManager.create();
+	m_textComponentMgr.add(m_maxScoreText, vec2{ WINDOW_WIDTH - 75u, 10 }, "125", m_renderer);
+
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ 10u, WINDOW_HEIGHT - 30u }, "Life: ", m_renderer);
+	m_lifeText = m_entityManager.create();
+	m_textComponentMgr.add(m_lifeText, vec2{ 100u, WINDOW_HEIGHT - 30u }, std::to_string(m_player.getLife()), m_renderer);
 }
 
 void Game::shoot()
@@ -332,7 +372,7 @@ void Game::checkCollisionsEnemyProjectiles()
 		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
 		if (SDL_HasIntersection(&projectileRect, &playerRect)) {
 			m_player.setLife(m_player.getLife() - 1);
-			std::cout << "player life down::" << m_player.getLife() << std::endl;
+			m_textComponentMgr.setText(m_lifeText, std::to_string(m_player.getLife()), m_renderer);			
 			m_projectileComponentMgr.destroy(projectileInstance);
 			m_entityManager.destroy(m_enemyProjectiles[i]);
 			m_enemyProjectiles.pop_back();

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Assert.h"
 #include "Entity.h"
 
 #include <stdint.h>
-#include <assert.h>
 #include <deque>
 #include <unordered_set>
 
@@ -28,9 +28,9 @@ public:
 			_free_indices.pop_front();
 		}
 		else {
+			idx = static_cast<unsigned int>(_generation.size());
 			_generation.push_back(0);
-			idx = static_cast<unsigned int>(_generation.size()) - 1;
-			assert(idx < (1 << ENTITY_INDEX_BITS));
+			ASSERT(idx < (1 << ENTITY_INDEX_BITS));
 		}
 		return Entity(idx, _generation[idx]);
 	}

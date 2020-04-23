@@ -5,14 +5,10 @@
 #include "../dodf/Instance.h"
 #include "../dodf/Entity.h"
 
-//#include <glm/glm.hpp>
-
 #include <unordered_map>
 
 using namespace std;
-//using namespace glm;using namespace std;
 
-//class Player: public IComponentManager 
 class Player  
 {
 private :

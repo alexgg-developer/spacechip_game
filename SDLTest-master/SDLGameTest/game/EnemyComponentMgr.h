@@ -6,8 +6,6 @@
 #include "../dodf/Entity.h"
 #include "../dodf/Assert.h"
 
-//#include <glm/glm.hpp>
-
 #include <unordered_map>
 #include <functional>
 
@@ -20,14 +18,13 @@
 #endif
 
 using namespace std;
-//using namespace glm;using namespace std;
 
 //class EnemyComponentMgr: public IComponentManager 
 class EnemyComponentMgr  
 {
 private :
 	struct InstanceData {
-		size_t* life;
+		int32_t* life;
 		Entity* entity;
 		vec3* position;
 	};

@@ -64,7 +64,6 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="GLM.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -95,16 +94,17 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\SDL2-2.0.10\include;$(SolutionDir)\Libraries\SDL2_image-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\SDL2-2.0.10\include;$(SolutionDir)\Libraries\SDL2_image-2.0.5\include;$(SolutionDir)\Libraries\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformShortName);$(SolutionDir)\Libraries\SDL2_ttf-2.0.15\lib\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>COPY $(SolutionDir)\Libraries\SDL2-2.0.10\lib\$(PlatformTarget)\*.dll $(TargetDir)\
-COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(TargetDir)\</Command>
+COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(TargetDir)\
+COPY $(SolutionDir)\Libraries\SDL2_ttf-2.0.15\lib\$(PlatformTarget)\*.dll $(TargetDir)\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -162,6 +162,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClCompile Include="game\Player.cpp" />
     <ClCompile Include="game\PlayerController.cpp" />
     <ClCompile Include="game\ProjectileComponentMgr.cpp" />
+    <ClCompile Include="game\TextComponentMgr.cpp" />
     <ClCompile Include="game\TextureMgr.cpp" />
     <ClCompile Include="game\Timer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -179,6 +180,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     <ClInclude Include="game\Player.h" />
     <ClInclude Include="game\PlayerController.h" />
     <ClInclude Include="game\ProjectileComponentMgr.h" />
+    <ClInclude Include="game\TextComponentMgr.h" />
     <ClInclude Include="game\TextureMgr.h" />
     <ClInclude Include="game\Timer.h" />
     <ClInclude Include="game\Vec.h" />

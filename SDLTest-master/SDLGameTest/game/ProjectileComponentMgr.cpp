@@ -7,7 +7,7 @@
 using namespace dodf;
 
 
-const size_t ProjectileComponentMgr::PROJECTILE_SIZE = 15;
+const size_t ProjectileComponentMgr::PROJECTILE_SIZE = 15u;
 
 void ProjectileComponentMgr::allocate(size_t size)
 {
