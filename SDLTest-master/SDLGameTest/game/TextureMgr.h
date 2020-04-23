@@ -16,7 +16,7 @@
 class TextureMgr  
 {
 public:
-	enum TextureID: size_t {
+	enum TextureID: uint32_t {
 		ENEMY,
 		PLAYER,
 		PLAYER_BULLET,		

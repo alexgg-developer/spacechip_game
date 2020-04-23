@@ -39,6 +39,14 @@ private:
 	static const size_t MAXIMUM_SHOTS_PLAYER = 3;
 	static const float INTERVAL_ENEMIES_SHOOT;
 
+	enum GameState : uint32_t {
+		DEFAULT,
+		GAME_OVER,
+		WIN,
+		SIZE
+	};
+
+
 	SDL_Renderer * m_renderer;
 	SDL_Window * m_window;
 
@@ -59,7 +67,7 @@ private:
 	TextureMgr m_textureMgr;
 
 	float m_timerEnemyShoot;
-	bool m_gameOver = false;
+	GameState m_state = GameState::DEFAULT;
 
 	void checkCollisionsPlayerProjectile();
 	void checkCollisionsEnemyProjectiles();
@@ -77,4 +85,5 @@ private:
 	void restart();
 	void shoot();
 	void shootEnemy();
+	void win();
 };

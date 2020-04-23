@@ -46,7 +46,6 @@ int Game::init()
 	error = m_textureMgr.init(m_renderer);
 	if (error) return error;
 
-	gameOver();
 	return error;
 }
 
@@ -89,7 +88,7 @@ void Game::initEnemies(bool allocate)
 	}		
 	const size_t HORIZONTAL_LIMIT = 5u;
 	m_enemyComponentMgr.setLimits((float)HORIZONTAL_LIMIT, (float)(WINDOW_WIDTH - HORIZONTAL_LIMIT - ENEMY_SIZE));
-	m_enemyComponentMgr.setSpeed(25.0f);
+	m_enemyComponentMgr.setSpeed(55.0f);
 	//m_enemyComponentMgr.setSpeed(225.0f);
 }
 
@@ -97,7 +96,7 @@ void Game::initObstacles(bool allocate)
 {
 	if(allocate) m_obstacleComponentMgr.allocate(50u);
 
-	const size_t OBSTACLE_COUNT = 1u;
+	const size_t OBSTACLE_COUNT = 5u;
 	const size_t OBSTACLE_MULTIPLIER = 2u;
 	constexpr size_t HORIZONTAL_MARGIN = 70u;
 	const size_t TOP_MARGIN = 90u;
@@ -110,7 +109,6 @@ void Game::initObstacles(bool allocate)
 	static std::mt19937 gen(rd());
 	std::uniform_int_distribution<> horizontalDis(HORIZONTAL_MARGIN, WINDOW_WIDTH - HORIZONTAL_MARGIN);
 	std::uniform_int_distribution<> verticalDis(TOP_MARGIN, BOTTOM_MARGIN);
-	//constexpr size_t HORIZONTAL_SPACE = WINDOW_WIDTH - HORIZONTAL_MARGIN * 2u;
 	for (size_t i = 0; i < obstacleCount; ++i) {
 		Entity obstacle = m_entityManager.create();
 		vec3 position;
@@ -138,7 +136,8 @@ void Game::run()
 	while (!m_input.check(Input::KESC)) {
 		SDL_PollEvent(&e);
 		m_input.read(e);
-		if (!m_gameOver) {
+		switch (m_state) {
+		case GameState::DEFAULT: {
 			float dt = m_timer.getDeltaTime();
 			m_playerController.update(m_input, dt);
 			m_projectileComponentMgr.update(dt);
@@ -157,9 +156,17 @@ void Game::run()
 
 			draw();
 		}
-		else {
+		break;
+
+		case Game::GAME_OVER:
 			if (m_input.checkPressed(Input::KENTER)) restart();
 			drawUI();
+		break;
+		
+		case Game::WIN:
+			if (m_input.checkPressed(Input::KENTER)) restart();
+			drawUI();
+		break;
 		}
 	}
 }
@@ -318,10 +325,13 @@ void Game::shootEnemy()
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(0, static_cast<int>(m_enemies.size()) - 1);
-
+	
+	vec3 position = m_enemyComponentMgr.getPosition(m_enemies[dis(gen)]);
+	position.x += EnemyComponentMgr::ENEMY_SIZE / 2u;
+	position.y += EnemyComponentMgr::ENEMY_SIZE;
 	m_projectileComponentMgr.add(m_enemyProjectiles.back(), 
-		m_enemyComponentMgr.getPosition(m_enemies[dis(gen)]), 
-		250.0f, 
+		position, 
+		300.0f, 
 		TextureMgr::TextureID::ENEMY_BULLET);
 }
 
@@ -414,8 +424,8 @@ void Game::checkCollisionsEnemyProjectiles()
 		if (SDL_HasIntersection(&projectileRect, &playerRect)) {
 			int32_t life = m_player.getLife() - 1;
 			m_textComponentMgr.setText(m_lifeText, std::to_string(life), m_renderer);
+			m_player.setLife(life);
 			if (life != 0) {
-				m_player.setLife(life);
 				m_projectileComponentMgr.destroy(projectileInstance);
 				m_entityManager.destroy(m_enemyProjectiles[i]);
 				m_enemyProjectiles.pop_back();
@@ -454,9 +464,19 @@ void Game::checkCollissionsEnemyWithPlayer()
 
 void Game::gameOver()
 {
-	m_gameOver = true;
+	m_state = GameState::GAME_OVER;
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH/2u - 100u, WINDOW_HEIGHT/2u - 100u }, "Game over", m_renderer);
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH/2u - 100u, WINDOW_HEIGHT/2u - 50u}, "Press enter to restart", m_renderer);
+
+	m_scoreMgr.saveHighScore();
+}
+
+
+void Game::win()
+{
+	m_state = GameState::WIN;
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 100u }, "You win!", m_renderer);
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 50u }, "Press enter to restart", m_renderer);
 
 	m_scoreMgr.saveHighScore();
 }
@@ -483,5 +503,5 @@ void Game::restart()
 	initUI(false);
 
 	m_timer.restart();
-	m_gameOver = false;
+	m_state = GameState::DEFAULT;
 }
