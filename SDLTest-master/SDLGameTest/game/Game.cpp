@@ -77,13 +77,11 @@ void Game::initEnemies(bool allocate)
 	const size_t LEFT_MARGIN = (WINDOW_WIDTH - NUMBER_COLUMNS * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES)) / 2u;
 	for (size_t i = 0; i < ENEMY_COUNT; ++i) {
 		m_enemies.push_back(m_entityManager.create());
-		vec3 position;
-		//position.x = i * EnemyComponentMgr::ENEMY_SIZE;
+		vec2 position;
 		size_t horizontalIndex = i % NUMBER_COLUMNS;
 		position.x = static_cast<float>(LEFT_MARGIN + horizontalIndex * (ENEMY_SIZE + HORIZONTAL_MARGIN_BETWEEN_ENEMIES));
 		size_t verticalIndex = i / NUMBER_COLUMNS;
 		position.y = static_cast<float>(TOP_MARGIN + verticalIndex * (ENEMY_SIZE + VERTICAL_MARGIN_BETWEEN_ENEMIES));
-		position.z = 0.0f;
 		m_enemyComponentMgr.add(m_enemies[i], position);
 	}		
 	const size_t HORIZONTAL_LIMIT = 5u;
@@ -111,17 +109,16 @@ void Game::initObstacles(bool allocate)
 	std::uniform_int_distribution<> verticalDis(TOP_MARGIN, BOTTOM_MARGIN);
 	for (size_t i = 0; i < obstacleCount; ++i) {
 		Entity obstacle = m_entityManager.create();
-		vec3 position;
+		vec2 position;
 		position.x = static_cast<float>(horizontalDis(gen));
 		position.y = static_cast<float>(verticalDis(gen));
-		position.z = 0.0f;
 		m_obstacleComponentMgr.add(obstacle, position);
 	}
 }
 
 void Game::initPlayer()
 {
-	vec3 position;
+	vec2 position;
 	position.x = 70.0f;
 	position.y = static_cast<float>(WINDOW_HEIGHT - 100u);
 	m_player.setPosition(position);
@@ -326,7 +323,7 @@ void Game::shootEnemy()
 	static std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(0, static_cast<int>(m_enemies.size()) - 1);
 	
-	vec3 position = m_enemyComponentMgr.getPosition(m_enemies[dis(gen)]);
+	vec2 position = m_enemyComponentMgr.getPosition(m_enemies[dis(gen)]);
 	position.x += EnemyComponentMgr::ENEMY_SIZE / 2u;
 	position.y += EnemyComponentMgr::ENEMY_SIZE;
 	m_projectileComponentMgr.add(m_enemyProjectiles.back(), 
@@ -352,7 +349,7 @@ void Game::destroyProjectile(Entity e)
 
 void Game::checkCollisionsPlayerProjectile()
 {
-	vec3* projectilePositions = m_projectileComponentMgr.getPositions();
+	vec2* projectilePositions = m_projectileComponentMgr.getPositions();
 	//size_t numberProjectiles = m_projectileComponentMgr.getSize();
 	SDL_Rect projectileRect;
 	projectileRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
@@ -407,7 +404,7 @@ void Game::checkCollisionsPlayerProjectile()
 
 void Game::checkCollisionsEnemyProjectiles()
 {
-	vec3* projectilePositions = m_projectileComponentMgr.getPositions();
+	vec2* projectilePositions = m_projectileComponentMgr.getPositions();
 	SDL_Rect projectileRect, playerRect;
 	playerRect.x = (int)m_player.getPosition().x;
 	playerRect.y = (int)m_player.getPosition().y;
@@ -440,7 +437,7 @@ void Game::checkCollisionsEnemyProjectiles()
 
 void Game::checkCollissionsEnemyWithPlayer()
 {
-	vec3* enemyPositions = m_enemyComponentMgr.getPositions();
+	vec2* enemyPositions = m_enemyComponentMgr.getPositions();
 	size_t enemyInstances = m_enemyComponentMgr.getSize();
 	SDL_Rect enemyRect, playerRect;
 	playerRect.x = (int)m_player.getPosition().x;

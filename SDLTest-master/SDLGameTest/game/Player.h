@@ -12,7 +12,7 @@ using namespace std;
 class Player  
 {
 private :
-	vec3 m_position;
+	vec2 m_position;
 	int32_t m_life = INITIAL_LIFE;
 	float m_speed = INITIAL_SPEED;
 
@@ -21,13 +21,13 @@ public:
 	static const int32_t INITIAL_LIFE;
 	static const float INITIAL_SPEED;
 
-	inline vec3 getPosition() { return m_position;  }	
+	inline vec2 getPosition() { return m_position;  }	
 	inline float getSpeed() { return m_speed; }
 	inline int32_t getLife() { return m_life; }
 	
 	void reset();
 	void setLife(int32_t life);
-	void setPosition(const vec3& newPosition);
+	void setPosition(const vec2& newPosition);
 	
 };
 

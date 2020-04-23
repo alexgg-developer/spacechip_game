@@ -16,7 +16,7 @@ class ProjectileComponentMgr
 {
 private :
 	struct InstanceData {
-		vec3* position;
+		vec2* position;
 		float* speed;
 		Entity* entity;
 		TextureMgr::TextureID* textureID;
@@ -32,11 +32,11 @@ public:
 	static const size_t PROJECTILE_SIZE;
 	//void allocate(size_t playerProjectiles, size_t enemyProjectiles)
 	void allocate(size_t size);
-	void add(const Entity& e, const vec3 & position, float speed, TextureMgr::TextureID textureID);
-	inline vec3 getPosition(const Entity& e) { return m_data.position[lookup(e).i]; }
-	inline vec3* const getPositions() { return m_data.position; }
+	void add(const Entity& e, const vec2 & position, float speed, TextureMgr::TextureID textureID);
+	inline vec2 getPosition(const Entity& e) { return m_data.position[lookup(e).i]; }
+	inline vec2* const getPositions() { return m_data.position; }
 	inline TextureMgr::TextureID* const getTextureIDs() { return m_data.textureID; }
-	inline std::pair<vec3*, size_t> const getPositionsAndSize() { return std::make_pair(m_data.position, m_instanceCount); }
+	inline std::pair<vec2*, size_t> const getPositionsAndSize() { return std::make_pair(m_data.position, m_instanceCount); }
 	inline size_t const getSize() { return m_instanceCount; }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 

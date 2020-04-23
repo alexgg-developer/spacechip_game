@@ -21,7 +21,7 @@ void PlayerController::setShootCallback(std::function <void(void)> callback)
 
 void PlayerController::update(const Input& input, float dt)
 {
-	vec3 position = m_player.getPosition();
+	auto position = m_player.getPosition();
 	float speed = m_player.getSpeed();
 
 	if (input.check(Input::KLEFT)) {

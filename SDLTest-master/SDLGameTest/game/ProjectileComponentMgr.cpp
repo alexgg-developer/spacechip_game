@@ -11,14 +11,14 @@ const size_t ProjectileComponentMgr::PROJECTILE_SIZE = 15u;
 
 void ProjectileComponentMgr::allocate(size_t size)
 {
-	m_data.position = static_cast<vec3*>(MemoryPool::Get(size * sizeof(vec3)));
+	m_data.position = static_cast<vec2*>(MemoryPool::Get(size * sizeof(vec2)));
 	m_data.speed = static_cast<float*>(MemoryPool::Get(size * sizeof(float)));
 	m_data.entity = static_cast<Entity*>(MemoryPool::Get(size * sizeof(Entity)));
 	m_data.textureID = static_cast<TextureMgr::TextureID*>(MemoryPool::Get(size * sizeof(TextureMgr::TextureID)));
 	m_capacity = size;
 }
 
-void ProjectileComponentMgr::add(const Entity& e, const vec3 & position, float speed, TextureMgr::TextureID textureID)
+void ProjectileComponentMgr::add(const Entity& e, const vec2 & position, float speed, TextureMgr::TextureID textureID)
 {
 	auto instance = Instance::create(m_instanceCount);
 	m_map[e.index()] = instance;
@@ -71,7 +71,7 @@ void ProjectileComponentMgr::destroy(Instance i)
 
 void ProjectileComponentMgr::reset()
 {
-	memset(m_data.position, 0, m_capacity * sizeof(vec3));
+	memset(m_data.position, 0, m_capacity * sizeof(vec2));
 	memset(m_data.entity, 0, m_capacity * sizeof(Entity));
 	memset(m_data.speed, 0, m_capacity * sizeof(float));
 	memset(m_data.textureID, 0, m_capacity * sizeof(TextureMgr::TextureID));

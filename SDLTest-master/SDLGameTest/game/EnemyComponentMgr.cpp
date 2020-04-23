@@ -35,7 +35,7 @@ void EnemyComponentMgr::destroy(const Entity & e)
 void EnemyComponentMgr::reset()
 {
 	memset(m_data.life, 0, m_capacity * sizeof(int32_t));
-	memset(m_data.position, 0, m_capacity * sizeof(vec3));
+	memset(m_data.position, 0, m_capacity * sizeof(vec2));
 	memset(m_data.entity, 0, m_capacity * sizeof(Entity));
 	
 	m_map.clear();
@@ -75,14 +75,14 @@ Entity EnemyComponentMgr::checkShot(const SDL_Rect& rect)
 void EnemyComponentMgr::allocate(size_t size)
 {
 	m_data.life = static_cast<int32_t*>(MemoryPool::Get(size * sizeof(int32_t)));
-	m_data.position = static_cast<vec3*>(MemoryPool::Get(size * sizeof(vec3)));
+	m_data.position = static_cast<vec2*>(MemoryPool::Get(size * sizeof(vec2)));
 	m_data.entity = static_cast<Entity*>(MemoryPool::Get(size * sizeof(Entity)));
 	
 	m_instanceCount = 0;
 	m_capacity = size;
 }
 
-void EnemyComponentMgr::add(const Entity& e, const vec3& position)
+void EnemyComponentMgr::add(const Entity& e, const vec2& position)
 {
 	auto instance = Instance::create(m_instanceCount);
 	m_map[e.index()] = instance;

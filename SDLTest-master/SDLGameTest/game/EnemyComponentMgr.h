@@ -26,7 +26,7 @@ private :
 	struct InstanceData {
 		int32_t* life;
 		Entity* entity;
-		vec3* position;
+		vec2* position;
 	};
 	
 	float m_speed, m_leftLimit, m_rightLimit;
@@ -39,12 +39,12 @@ public:
 	static const size_t ENEMY_SIZE;
 
 	inline int32_t getLife(Instance i) { ASSERT(i.i < m_instanceCount); return m_data.life[i.i]; }
-	inline vec3 getPosition(const Entity& e) const { return m_data.position[lookup(e).i];  }
-	inline vec3* const getPositions() const { return m_data.position;  }
+	inline vec2 getPosition(const Entity& e) const { return m_data.position[lookup(e).i];  }
+	inline vec2* const getPositions() const { return m_data.position;  }
 	inline size_t const getSize() const { return m_instanceCount;  }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 	
-	void add(const Entity& e, const vec3& position);
+	void add(const Entity& e, const vec2& position);
 	//void allocate(size_t size) override;
 	void allocate(size_t size);
 	void checkLimits();

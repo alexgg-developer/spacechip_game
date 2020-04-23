@@ -21,7 +21,7 @@ void Player::setLife(int32_t life)
 	m_life = life;
 }
 
-void Player::setPosition(const vec3& newPosition)
+void Player::setPosition(const vec2& newPosition)
 {
 	m_position = newPosition;
 }
