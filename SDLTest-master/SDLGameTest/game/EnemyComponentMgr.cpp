@@ -43,11 +43,6 @@ void EnemyComponentMgr::setLimits(float leftLimit, float rightLimit)
 	m_rightLimit = rightLimit;
 }
 
-void EnemyComponentMgr::setLimitReachedCallback(std::function<void(void)> callback)
-{
-	m_limitReached = callback;
-}
-
 Entity EnemyComponentMgr::checkShot(const SDL_Rect& rect)
 {
 	Entity entityShot;
@@ -110,7 +105,6 @@ void EnemyComponentMgr::checkLimits()
 			m_data.position[i].y += enemySize * 0.3f;
 			m_data.position[i].x += enemySize * 0.1f * copysignf(1.0f, m_speed);
 		}
-		m_limitReached();
 	}
 }
 

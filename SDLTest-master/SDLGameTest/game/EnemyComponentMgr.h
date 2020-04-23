@@ -33,7 +33,6 @@ private :
 	InstanceData m_data;
 	size_t m_instanceCount;
 	unordered_map<uint32_t, Instance> m_map;
-	std::function <void(void)> m_limitReached;
 
 public:
 	static const size_t ENEMY_SIZE;
@@ -53,7 +52,6 @@ public:
 	void destroy(const Entity& e);
 	void setLife(Instance i, int32_t life);
 	void setLimits(float leftLimit, float rightLimit);
-	void setLimitReachedCallback(std::function <void(void)> callback);
 	void setSpeed(float speed);
 	void update(float dt);
 };

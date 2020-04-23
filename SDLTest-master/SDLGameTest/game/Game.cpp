@@ -30,19 +30,26 @@ int Game::init()
 	int error = 0;
 	error += initSDL();
 	if (error) return error;
+	
 	size_t initSize = 512 * 1024 * 1024; //512MB
 	dodf::MemoryPool::Initialize(initSize);
+	
 	const size_t PROJECTILE_MAX = 30u;
 	m_projectileComponentMgr.allocate(PROJECTILE_MAX);
 	//y = 0 on top
 	m_projectileComponentMgr.setLimits(static_cast<float>(WINDOW_HEIGHT) - 30.0f, 30.0f);
+	
 	using std::placeholders::_1;
 	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
 	m_playerProjectiles.reserve(PROJECTILE_MAX);
+	
+	m_scoreMgr.init();
+
 	initEnemies();
 	initObstacles();
 	initPlayer();
-	initUI();
+	initUI();	
+
 	error = m_textureMgr.init(m_renderer);
 	if (error) return error;
 
@@ -52,7 +59,6 @@ int Game::init()
 void Game::initEnemies()
 {
 	m_enemyComponentMgr.allocate(100u);
-	m_enemyComponentMgr.setLimitReachedCallback(std::bind(&Game::checkCollissionsEnemyWithPlayer, this));
 
 	constexpr size_t NUMBER_ROWS = 5u;
 	constexpr size_t NUMBER_COLUMNS = 17u;
@@ -136,6 +142,7 @@ void Game::run()
 		m_projectileComponentMgr.checkOffLimits();
 		m_enemyComponentMgr.update(dt);
 		m_enemyComponentMgr.checkLimits();
+		checkCollissionsEnemyWithPlayer();
 		checkCollisionsPlayerProjectile();
 		checkCollisionsEnemyProjectiles();
 
@@ -256,11 +263,11 @@ void Game::initUI()
 
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ 20u, 10u }, "Score: ", m_renderer);
 	m_currentScoreText = m_entityManager.create();
-	m_textComponentMgr.add(m_currentScoreText, vec2{ 110u, 10u }, "100", m_renderer);
+	m_textComponentMgr.add(m_currentScoreText, vec2{ 110u, 10u }, std::to_string(m_scoreMgr.getCurrentScore()), m_renderer);
 
-	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH - 225u, 10 }, "Max score: ", m_renderer);
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH - 225u, 10 }, "High score: ", m_renderer);
 	m_maxScoreText = m_entityManager.create();
-	m_textComponentMgr.add(m_maxScoreText, vec2{ WINDOW_WIDTH - 75u, 10 }, "125", m_renderer);
+	m_textComponentMgr.add(m_maxScoreText, vec2{ WINDOW_WIDTH - 65u, 10 }, std::to_string(m_scoreMgr.getHighScore()), m_renderer);
 
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ 10u, WINDOW_HEIGHT - 30u }, "Life: ", m_renderer);
 	m_lifeText = m_entityManager.create();
@@ -324,6 +331,8 @@ void Game::checkCollisionsPlayerProjectile()
 				m_obstacleComponentMgr.setLife(obstacleInstance, life);				
 			}
 			else {
+				m_scoreMgr.addScore(ScoreMgr::ScoreID::OBSTACLE);
+				m_textComponentMgr.setText(m_currentScoreText, std::to_string(m_scoreMgr.getCurrentScore()), m_renderer);
 				m_obstacleComponentMgr.destroy(collided);
 				m_entityManager.destroy(collided);
 			}
@@ -341,6 +350,8 @@ void Game::checkCollisionsPlayerProjectile()
 					m_enemyComponentMgr.setLife(enemyInstance, life);
 				}
 				else {
+					m_scoreMgr.addScore(ScoreMgr::ScoreID::ENEMY);
+					m_textComponentMgr.setText(m_currentScoreText, std::to_string(m_scoreMgr.getCurrentScore()), m_renderer);
 					m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
 					m_enemyComponentMgr.destroy(collided);
 					m_entityManager.destroy(collided);
@@ -371,11 +382,18 @@ void Game::checkCollisionsEnemyProjectiles()
 		projectileRect.x = (int)projectilePositions[projectileInstance.i].x;
 		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
 		if (SDL_HasIntersection(&projectileRect, &playerRect)) {
-			m_player.setLife(m_player.getLife() - 1);
-			m_textComponentMgr.setText(m_lifeText, std::to_string(m_player.getLife()), m_renderer);			
-			m_projectileComponentMgr.destroy(projectileInstance);
-			m_entityManager.destroy(m_enemyProjectiles[i]);
-			m_enemyProjectiles.pop_back();
+			int32_t life = m_player.getLife() - 1;
+			m_textComponentMgr.setText(m_lifeText, std::to_string(life), m_renderer);
+			if (life != 0) {
+				m_player.setLife(life);
+				m_projectileComponentMgr.destroy(projectileInstance);
+				m_entityManager.destroy(m_enemyProjectiles[i]);
+				m_enemyProjectiles.pop_back();
+			}
+			else {
+				gameOver();
+				break;
+			}
 		}
 	}
 }
@@ -398,9 +416,13 @@ void Game::checkCollissionsEnemyWithPlayer()
 		enemyRect.y = (int)enemyPositions[i].y;
 		if (SDL_HasIntersection(&enemyRect, &playerRect)) {
 			m_player.setLife(0);			
-			std::cout << "game over" << std::endl;
+			gameOver();
 			break;
 		}
 	}
 }
 
+void Game::gameOver()
+{
+	m_scoreMgr.saveHighScore();
+}

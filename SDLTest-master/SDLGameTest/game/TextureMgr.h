@@ -2,9 +2,6 @@
 
 #include "Vec.h"
 
-#include <unordered_map>
-
-using namespace std;
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #include <SDL.h>
@@ -14,9 +11,10 @@ using namespace std;
 #include <SDL2_image/SDL_image.h>
 #endif
 
+#include <string>
+
 class TextureMgr  
 {
-
 public:
 	enum TextureID: size_t {
 		ENEMY,
@@ -27,7 +25,6 @@ public:
 		SIZE
 	};
 
-	~TextureMgr(); 
 	void clean();
 	SDL_Texture* getTexture(TextureID textureID);
 	inline SDL_Texture** getTextures() { return m_textures; }

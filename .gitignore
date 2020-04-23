@@ -33,3 +33,5 @@ Debug
 *.suo
 *.db
 *.opendb
+/SDLTest-master/highscore
+/SDLTest-master/highscore.bin

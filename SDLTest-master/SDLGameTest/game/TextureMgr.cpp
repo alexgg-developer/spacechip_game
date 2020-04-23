@@ -7,11 +7,6 @@
 
 using namespace dodf;
 
-TextureMgr::~TextureMgr()
-{
-	
-}
-
 void TextureMgr::clean()
 {
 	for (size_t i = 0; i < TextureID::SIZE; ++i) {

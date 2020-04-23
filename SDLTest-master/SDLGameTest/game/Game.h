@@ -20,6 +20,7 @@
 #include "Timer.h"
 #include "PlayerController.h"
 #include "TextureMgr.h"
+#include "ScoreMgr.h"
 
 #include "../dodf/Entity.h"
 #include "../dodf/EntityManager.h"
@@ -42,7 +43,6 @@ private:
 	SDL_Renderer * m_renderer;
 	SDL_Window * m_window;
 
-	EntityManager m_entityManager;
 	EnemyComponentMgr m_enemyComponentMgr;
 	ObstacleComponentMgr m_obstacleComponentMgr;
 	ProjectileComponentMgr m_projectileComponentMgr;	
@@ -55,13 +55,17 @@ private:
 	Input m_input;
 	Timer m_timer;
 	PlayerController m_playerController;
+	EntityManager m_entityManager;
+	ScoreMgr m_scoreMgr;
 	TextureMgr m_textureMgr;
+
 	float m_timerEnemyShoot;
 
 	void checkCollisionsPlayerProjectile();
 	void checkCollisionsEnemyProjectiles();
 	void checkCollissionsEnemyWithPlayer();
 	void destroyProjectile(Entity e);
+	void gameOver();
 	void initEnemies();
 	void initPlayer();
 	void initObstacles();
