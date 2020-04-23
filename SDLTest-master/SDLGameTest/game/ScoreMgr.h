@@ -22,6 +22,7 @@ public:
 
 	void addScore(ScoreID scoreID);
 	void init();
+	void reset();
 	void setHighScore(uint32_t highScore);
 	void saveHighScore();
 private:

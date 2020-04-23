@@ -30,7 +30,7 @@ private :
 	};
 
 	InstanceData m_data;
-	size_t m_instanceCount;
+	size_t m_instanceCount, m_capacity;
 	unordered_map<uint32_t, Instance> m_map;
 	std::function <void(Entity)> m_destroyCallback;
 
@@ -46,8 +46,8 @@ public:
 	void add(const Entity& e, const vec3& position);
 	void allocate(size_t size);
 	Entity checkShot(const SDL_Rect& rect);
-	void clean();
 	void destroy(const Entity& e);
+	void reset();
 	void setDestroyCallback(std::function <void(Entity)> callback);
 	void setLife(Instance i, int32_t life);
 };

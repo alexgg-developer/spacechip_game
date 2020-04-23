@@ -47,6 +47,9 @@ void Input::read(SDL_Event const & event)
 		case SDLK_SPACE:
 			keys[KSPACE] = KEY_PRESSED;
 			break;
+		case SDLK_RETURN:
+			keys[KENTER] = KEY_PRESSED;
+			break;
 		}
 		break;
 	case SDL_KEYUP:
@@ -80,6 +83,9 @@ void Input::read(SDL_Event const & event)
 			break;
 		case SDLK_SPACE:
 			keys[KSPACE] = KEY_RELEASED;
+			break;
+		case SDLK_RETURN:
+			keys[KENTER] = KEY_RELEASED;
 			break;
 		}
 		break;	

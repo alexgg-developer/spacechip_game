@@ -30,7 +30,6 @@ class Game
 public: 
 	Game();
 	~Game();
-	void draw();
 	int init();
 	void run();
 
@@ -60,17 +59,22 @@ private:
 	TextureMgr m_textureMgr;
 
 	float m_timerEnemyShoot;
+	bool m_gameOver = false;
 
 	void checkCollisionsPlayerProjectile();
 	void checkCollisionsEnemyProjectiles();
 	void checkCollissionsEnemyWithPlayer();
 	void destroyProjectile(Entity e);
+	void draw();
+	void drawUI();
 	void gameOver();
-	void initEnemies();
+	void initEnemies(bool allocate);
 	void initPlayer();
-	void initObstacles();
+	void initProjectiles();
+	void initObstacles(bool allocate);
 	int initSDL();
-	void initUI();
+	void initUI(bool allocate);
+	void restart();
 	void shoot();
 	void shootEnemy();
 };

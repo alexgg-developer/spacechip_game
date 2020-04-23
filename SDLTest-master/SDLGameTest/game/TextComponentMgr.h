@@ -27,7 +27,7 @@ private :
 
 	};
 	InstanceData m_data;
-	size_t m_instanceCount;
+	size_t m_instanceCount, m_capacity;
 	unordered_map<uint32_t, Instance> m_map;
 	TTF_Font* m_font = nullptr;
 	SDL_Color m_textColor;
@@ -44,6 +44,7 @@ public:
 	void clean();
 	void destroy(const Entity & e);
 	void init(size_t size);
+	void reset();
 	void setText(const Entity&e, const std::string& newText, SDL_Renderer * const renderer);
 };
 

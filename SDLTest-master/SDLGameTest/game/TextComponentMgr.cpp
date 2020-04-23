@@ -24,7 +24,20 @@ void TextComponentMgr::init(size_t size)
 	m_textColor.g = 255;
 	m_textColor.b = 255;
 	m_textColor.a = 255;
+	
+	m_capacity = size;
+}
 
+void TextComponentMgr::reset()
+{
+	memset(m_data.position, 0, m_capacity * sizeof(vec2));
+	memset(m_data.width, 0, m_capacity * sizeof(uint32_t));
+	memset(m_data.height, 0, m_capacity * sizeof(uint32_t));
+	memset(m_data.textures, 0, m_capacity * sizeof(SDL_Texture*));
+	memset(m_data.entity, 0, m_capacity * sizeof(Entity));
+
+	m_map.clear();
+	m_instanceCount = 0;
 }
 
 void TextComponentMgr::setText(const Entity & e, const std::string & newText, SDL_Renderer * const renderer)

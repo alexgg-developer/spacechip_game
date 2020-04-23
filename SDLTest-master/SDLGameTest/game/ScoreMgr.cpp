@@ -36,6 +36,7 @@ void ScoreMgr::saveHighScore()
 			file.write(reinterpret_cast<const char *>(&m_currentScore), sizeof(m_currentScore));
 			file.close();
 		}
+		m_highScore = m_currentScore;
 	}
 }
 
@@ -46,4 +47,9 @@ void ScoreMgr::loadHighScore()
 		file.read(reinterpret_cast<char *>(&m_highScore), sizeof(m_highScore));
 		file.close();
 	}
+}
+
+void ScoreMgr::reset()
+{
+	m_currentScore = 0;	
 }

@@ -8,10 +8,6 @@ using namespace dodf;
 
 const size_t ObstacleComponentMgr::OBSTACLE_SIZE = 55;
 
-void ObstacleComponentMgr::clean()
-{
-
-}
 
 void ObstacleComponentMgr::destroy(const Entity & e)
 {
@@ -29,6 +25,15 @@ void ObstacleComponentMgr::destroy(const Entity & e)
 	m_map[lastEntity.index()] = i;
 
 	--m_instanceCount;
+}
+
+void ObstacleComponentMgr::reset()
+{
+	memset(m_data.life, 0, m_capacity * sizeof(int32_t));
+	memset(m_data.position, 0, m_capacity * sizeof(vec3));
+	memset(m_data.entity, 0, m_capacity * sizeof(Entity));
+	m_map.clear();
+	m_instanceCount = 0;
 }
 
 
@@ -58,6 +63,7 @@ void ObstacleComponentMgr::allocate(size_t size)
 	m_data.entity = static_cast<Entity*>(MemoryPool::Get(size * sizeof(Entity)));
 
 	m_instanceCount = 0;
+	m_capacity = size;
 }
 
 void ObstacleComponentMgr::add(const Entity& e, const vec3& position)

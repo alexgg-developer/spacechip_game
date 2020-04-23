@@ -15,6 +15,7 @@ void ProjectileComponentMgr::allocate(size_t size)
 	m_data.speed = static_cast<float*>(MemoryPool::Get(size * sizeof(float)));
 	m_data.entity = static_cast<Entity*>(MemoryPool::Get(size * sizeof(Entity)));
 	m_data.textureID = static_cast<TextureMgr::TextureID*>(MemoryPool::Get(size * sizeof(TextureMgr::TextureID)));
+	m_capacity = size;
 }
 
 void ProjectileComponentMgr::add(const Entity& e, const vec3 & position, float speed, TextureMgr::TextureID textureID)
@@ -66,6 +67,17 @@ void ProjectileComponentMgr::destroy(Instance i)
 	m_map[lastEntity.index()] = i;
 
 	--m_instanceCount;
+}
+
+void ProjectileComponentMgr::reset()
+{
+	memset(m_data.position, 0, m_capacity * sizeof(vec3));
+	memset(m_data.entity, 0, m_capacity * sizeof(Entity));
+	memset(m_data.speed, 0, m_capacity * sizeof(float));
+	memset(m_data.textureID, 0, m_capacity * sizeof(TextureMgr::TextureID));
+
+	m_map.clear();
+	m_instanceCount = 0;
 }
 
 void ProjectileComponentMgr::setDestroyCallback(std::function<void(Entity)> callback)

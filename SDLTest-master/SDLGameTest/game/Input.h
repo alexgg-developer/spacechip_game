@@ -13,7 +13,7 @@
 class Input
 {
 public:
-	enum keysDefined { KUP, KDOWN, KRIGHT, KLEFT, KW, KA, KS, KD, KESC, KSPACE, nkeys };
+	enum keysDefined { KUP, KDOWN, KRIGHT, KLEFT, KW, KA, KS, KD, KESC, KSPACE, KENTER, nkeys };
 
 	Input();
 	void read(SDL_Event const & event);

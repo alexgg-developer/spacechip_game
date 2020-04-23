@@ -46,4 +46,6 @@ public:
 		++_generation[idx];
 		_free_indices.push_back(idx);
 	}
+
+	void reset();
 };

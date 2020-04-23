@@ -34,38 +34,43 @@ int Game::init()
 	size_t initSize = 512 * 1024 * 1024; //512MB
 	dodf::MemoryPool::Initialize(initSize);
 	
-	const size_t PROJECTILE_MAX = 30u;
-	m_projectileComponentMgr.allocate(PROJECTILE_MAX);
-	//y = 0 on top
-	m_projectileComponentMgr.setLimits(static_cast<float>(WINDOW_HEIGHT) - 30.0f, 30.0f);
-	
-	using std::placeholders::_1;
-	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
-	m_playerProjectiles.reserve(PROJECTILE_MAX);
 	
 	m_scoreMgr.init();
 
-	initEnemies();
-	initObstacles();
+	initProjectiles();
+	initEnemies(true);
+	initObstacles(true);
 	initPlayer();
-	initUI();	
+	initUI(true);	
 
 	error = m_textureMgr.init(m_renderer);
 	if (error) return error;
 
+	gameOver();
 	return error;
 }
 
-void Game::initEnemies()
+void Game::initProjectiles()
 {
-	m_enemyComponentMgr.allocate(100u);
+	const size_t PROJECTILE_MAX = 30u;
+	m_projectileComponentMgr.allocate(PROJECTILE_MAX);
+	m_playerProjectiles.reserve(PROJECTILE_MAX);
 
+	using std::placeholders::_1;
+	m_projectileComponentMgr.setDestroyCallback(std::bind(&Game::destroyProjectile, this, _1));
+	//y = 0 on top
+	m_projectileComponentMgr.setLimits(static_cast<float>(WINDOW_HEIGHT) - 30.0f, 30.0f);
+}
+
+void Game::initEnemies(bool allocate)
+{
 	constexpr size_t NUMBER_ROWS = 5u;
 	constexpr size_t NUMBER_COLUMNS = 17u;
 	constexpr size_t ENEMY_COUNT = NUMBER_COLUMNS * NUMBER_ROWS;
-	m_enemyComponentMgr.allocate(ENEMY_COUNT);
-	m_enemies.reserve(ENEMY_COUNT);
-	//const size_t LEFT_MARGIN = 70u;
+	if (allocate) {
+		m_enemyComponentMgr.allocate(ENEMY_COUNT);
+		m_enemies.reserve(ENEMY_COUNT);
+	}
 	const size_t TOP_MARGIN = 90u;
 	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE; //35
 	const size_t HORIZONTAL_MARGIN_BETWEEN_ENEMIES = 3u;
@@ -88,9 +93,9 @@ void Game::initEnemies()
 	//m_enemyComponentMgr.setSpeed(225.0f);
 }
 
-void Game::initObstacles()
+void Game::initObstacles(bool allocate)
 {
-	m_obstacleComponentMgr.allocate(50u);
+	if(allocate) m_obstacleComponentMgr.allocate(50u);
 
 	const size_t OBSTACLE_COUNT = 1u;
 	const size_t OBSTACLE_MULTIPLIER = 2u;
@@ -128,31 +133,34 @@ void Game::initPlayer()
 
 void Game::run()
 {
-	//while()
-	SDL_Event e;	
-
 	m_timer.start();
-
+	SDL_Event e;
 	while (!m_input.check(Input::KESC)) {
 		SDL_PollEvent(&e);
 		m_input.read(e);
-		float dt = m_timer.getDeltaTime();
-		m_playerController.update(m_input, dt);		
-		m_projectileComponentMgr.update(dt);
-		m_projectileComponentMgr.checkOffLimits();
-		m_enemyComponentMgr.update(dt);
-		m_enemyComponentMgr.checkLimits();
-		checkCollissionsEnemyWithPlayer();
-		checkCollisionsPlayerProjectile();
-		checkCollisionsEnemyProjectiles();
+		if (!m_gameOver) {
+			float dt = m_timer.getDeltaTime();
+			m_playerController.update(m_input, dt);
+			m_projectileComponentMgr.update(dt);
+			m_projectileComponentMgr.checkOffLimits();
+			m_enemyComponentMgr.update(dt);
+			m_enemyComponentMgr.checkLimits();
+			checkCollissionsEnemyWithPlayer();
+			checkCollisionsPlayerProjectile();
+			checkCollisionsEnemyProjectiles();
 
-		m_timerEnemyShoot += dt;
-		if (m_timerEnemyShoot >= INTERVAL_ENEMIES_SHOOT) {
-			shootEnemy();
-			m_timerEnemyShoot = 0.0f;
+			m_timerEnemyShoot += dt;
+			if (m_timerEnemyShoot >= INTERVAL_ENEMIES_SHOOT) {
+				shootEnemy();
+				m_timerEnemyShoot = 0.0f;
+			}
+
+			draw();
 		}
-
-		draw();
+		else {
+			if (m_input.checkPressed(Input::KENTER)) restart();
+			drawUI();
+		}
 	}
 }
 
@@ -221,6 +229,28 @@ void Game::draw()
 }
 
 
+void Game::drawUI()
+{
+	SDL_RenderClear(m_renderer);
+
+	SDL_Texture** textTextures = m_textComponentMgr.getTextures();
+	vec2* positions_ = m_textComponentMgr.getPositions();
+	size_t size = m_textComponentMgr.getSize();
+	uint32_t* width = m_textComponentMgr.getWidths();
+	uint32_t* height = m_textComponentMgr.getHeights();
+	SDL_Rect textureRect;
+	for (size_t i = 0; i < size; ++i) {
+		textureRect.x = (int)positions_[i].x;
+		textureRect.y = (int)positions_[i].y;
+		textureRect.w = (int)width[i];  // the width of the texture
+		textureRect.h = (int)height[i];  // the height of the texture
+		SDL_RenderCopy(m_renderer, textTextures[i], nullptr, &textureRect);
+	}
+	SDL_RenderPresent(m_renderer);
+}
+
+
+
 int Game::initSDL()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -256,10 +286,10 @@ int Game::initSDL()
 	return 0;
 }
 
-void Game::initUI()
+void Game::initUI(bool allocate)
 {
 	const size_t TEXT_MAX = 30u;
-	m_textComponentMgr.init(TEXT_MAX);
+	if(allocate) m_textComponentMgr.init(TEXT_MAX);
 
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ 20u, 10u }, "Score: ", m_renderer);
 	m_currentScoreText = m_entityManager.create();
@@ -424,5 +454,34 @@ void Game::checkCollissionsEnemyWithPlayer()
 
 void Game::gameOver()
 {
+	m_gameOver = true;
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH/2u - 100u, WINDOW_HEIGHT/2u - 100u }, "Game over", m_renderer);
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH/2u - 100u, WINDOW_HEIGHT/2u - 50u}, "Press enter to restart", m_renderer);
+
 	m_scoreMgr.saveHighScore();
+}
+
+void Game::restart()
+{
+	m_entityManager.reset();
+
+	m_enemyComponentMgr.reset();
+	m_enemies.clear();
+	initEnemies(false);
+
+	m_obstacleComponentMgr.reset();
+	initObstacles(false);
+
+	m_projectileComponentMgr.reset();
+	m_playerProjectiles.clear();
+	m_enemyProjectiles.clear();
+	
+	m_player.reset();
+	m_scoreMgr.reset();
+
+	m_textComponentMgr.reset();
+	initUI(false);
+
+	m_timer.restart();
+	m_gameOver = false;
 }

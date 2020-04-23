@@ -15,7 +15,6 @@ using namespace std;
 class ProjectileComponentMgr  
 {
 private :
-
 	struct InstanceData {
 		vec3* position;
 		float* speed;
@@ -24,7 +23,7 @@ private :
 
 	};
 	InstanceData m_data;
-	size_t m_instanceCount;
+	size_t m_instanceCount, m_capacity;
 	unordered_map<uint32_t, Instance> m_map;
 
 	float m_bottomLimit, m_topLimit;
@@ -44,6 +43,7 @@ public:
 	void checkOffLimits();
 	void destroy(const Entity & e);
 	void destroy(Instance i);
+	void reset();
 	void setDestroyCallback(std::function <void(Entity)> callback);
 	void setLimits(float bottomLimit, float topLimit);
 	void update(float dt);

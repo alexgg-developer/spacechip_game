@@ -6,7 +6,15 @@
 
 using namespace dodf;
 
-const size_t Player::SIZE = 30;
+const size_t Player::SIZE = 30u;
+const int32_t Player::INITIAL_LIFE = 3;
+const float Player::INITIAL_SPEED = 160.0f;
+
+void Player::reset()
+{
+	m_life = INITIAL_LIFE;
+	m_speed = INITIAL_SPEED;
+}
 
 void Player::setLife(int32_t life)
 {
