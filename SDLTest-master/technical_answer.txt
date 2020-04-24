@@ -54,6 +54,7 @@ Use smaller data types, for example replacing float data types of 32 bits for th
 -Reduce texture file size
 
 The size of texture affects GPU memory bandwith, if the total memory pushed per second exceeds the graphics card's total memory we can have a bottleneck.
+You can achieve this reducing the resolution or compressing the texture.
 
 -Baked animations
 
@@ -61,6 +62,10 @@ This will depend on the 3D rigging and animation tool that we are using, and the
 smaller file sizes and memory overhead than blended/skinned animations. Baked animations work by storing a keyframed position for each vertex for each frame that
 was sampled, and if the mesh's polygon count is low enough, then we may see some significant savings through this simple change.
 
+-Baked lighting
+
+Mostly for just lights that are static and affect static objects, you can instead of calculating light in real time bake the illumination of a scene in a texture to use 
+in the game.
 
 -Multithreaded rendering
 
@@ -77,6 +82,10 @@ The animation system, working on the CPU, only transforms the bones, but another
 to place the vertices around those bones, performing a weighted average over the bones connected to those vertices.
 Otherwise if we are GPU bound but we the CPU is more or less free we can desactivate this to free the GPU.
 
+-Frustum Culling
+
+Technique used to avoid render everything is outside of the frustum view of the current camera.
+
 -Occlusion Culling
 
 If we have noticed that we are overdrawing (depending on the order in which objects are rendered we can be rendering a lot of objects that they are occluded 
@@ -84,4 +93,27 @@ by others), we can use this technique to try to lessen overdraw.
 The system works by partitioning the space of our scene into a series of cells and flying through the world with a virtual camera making note of which cells are invisible
 from other cells (are occluded) based on the size and position of the objects present.
 
+-Antialising
 
+Choose a cheaper antialising or desactivate antialising for a boost in performance.
+
+
+-Shadows
+
+Reduce quality of shadows (not using soft shadows or using a lower resolution shadow map).
+
+-Fog
+
+Avoid fog effects or use tricks like planes that fade in and fade out.
+
+-Bump mapping
+
+Avoid or use baked bumpmaps
+
+-Defer calculations
+
+If there are calculations that take too much time, see if they can be done partially and distribute work between to future frames.
+
+-Object Pooling
+
+A good way to avoid allocation and deallocations is to have a pool with preallocated object that you can get from and return to the pool.
