@@ -195,14 +195,15 @@ void Game::draw()
 
 
 	SDL_Texture** textures = m_textureMgr.getTextures();
-	auto projectilePositions = m_projectileComponentMgr.getPositions();
+	xCoords = m_projectileComponentMgr.getXCoords();
+	yCoords = m_projectileComponentMgr.getYCoords();
 	auto textureIDs = m_projectileComponentMgr.getTextureIDs();
 	size_t numberProjectiles = m_projectileComponentMgr.getSize();
 	textureRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;  
 	textureRect.h = (int)ProjectileComponentMgr::PROJECTILE_SIZE;  
 	for (size_t i = 0; i < numberProjectiles; ++i) {
-		textureRect.x = (int)projectilePositions[i].x;
-		textureRect.y = (int)projectilePositions[i].y;
+		textureRect.x = (int)xCoords[i];
+		textureRect.y = (int)yCoords[i];
 		SDL_RenderCopy(m_renderer, textures[textureIDs[i]], nullptr, &textureRect);
 	}
 	
@@ -351,16 +352,16 @@ void Game::destroyProjectile(Entity e)
 
 void Game::checkCollisionsPlayerProjectile()
 {
-	vec2* projectilePositions = m_projectileComponentMgr.getPositions();
-	//size_t numberProjectiles = m_projectileComponentMgr.getSize();
+	float* xCoordsProjectile = m_projectileComponentMgr.getXCoords();
+	float* yCoordsProjectile = m_projectileComponentMgr.getYCoords();
 	SDL_Rect projectileRect;
 	projectileRect.w = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
 	projectileRect.h = (int)ProjectileComponentMgr::PROJECTILE_SIZE;
 	
 	for (intptr_t i = m_playerProjectiles.size() - 1; i >= 0; --i) {
 		Instance projectileInstance = m_projectileComponentMgr.lookup(m_playerProjectiles[i]);
-		projectileRect.x = (int)projectilePositions[projectileInstance.i].x;
-		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
+		projectileRect.x = (int)xCoordsProjectile[projectileInstance.i];
+		projectileRect.y = (int)yCoordsProjectile[projectileInstance.i];
 
 		Entity collided = m_obstacleComponentMgr.checkShot(projectileRect);
 		if (collided.isValid()) {
@@ -406,7 +407,8 @@ void Game::checkCollisionsPlayerProjectile()
 
 void Game::checkCollisionsEnemyProjectiles()
 {
-	vec2* projectilePositions = m_projectileComponentMgr.getPositions();
+	float* xCoordsProjectile = m_projectileComponentMgr.getXCoords();
+	float* yCoordsProjectile = m_projectileComponentMgr.getYCoords();
 	SDL_Rect projectileRect, playerRect;
 	playerRect.x = (int)m_player.getPosition().x;
 	playerRect.y = (int)m_player.getPosition().y;
@@ -418,8 +420,8 @@ void Game::checkCollisionsEnemyProjectiles()
 
 	for (intptr_t i = m_enemyProjectiles.size() - 1; i >= 0; --i) {
 		Instance projectileInstance = m_projectileComponentMgr.lookup(m_enemyProjectiles[i]);
-		projectileRect.x = (int)projectilePositions[projectileInstance.i].x;
-		projectileRect.y = (int)projectilePositions[projectileInstance.i].y;
+		projectileRect.x = (int)xCoordsProjectile[projectileInstance.i];
+		projectileRect.y = (int)yCoordsProjectile[projectileInstance.i];
 		if (SDL_HasIntersection(&projectileRect, &playerRect)) {
 			int32_t life = m_player.getLife() - 1;
 			m_textComponentMgr.setText(m_lifeText, std::to_string(life), m_renderer);
