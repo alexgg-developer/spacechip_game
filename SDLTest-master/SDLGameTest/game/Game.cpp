@@ -176,11 +176,13 @@ void Game::draw()
 	SDL_Rect textureRect;
 	textureRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
 	textureRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
-	auto positions = m_enemyComponentMgr.getPositions();
+	//auto positions = m_enemyComponentMgr.getPositions();
+	auto xCoords = m_enemyComponentMgr.getXCoords();
+	auto yCoords = m_enemyComponentMgr.getYCoords();
 	auto size = m_enemyComponentMgr.getSize();
 	for (size_t i = 0; i < size; ++i) {
-		textureRect.x = (int)positions[i].x;
-		textureRect.y = (int)positions[i].y;
+		textureRect.x = (int)xCoords[i];
+		textureRect.y = (int)yCoords[i];
 		SDL_RenderCopy(m_renderer, textureEnemy, nullptr, &textureRect);
 	}
 
@@ -208,7 +210,7 @@ void Game::draw()
 	SDL_Texture* textureObstacle = m_textureMgr.getTexture(TextureMgr::TextureID::OBSTACLE);
 	textureRect.w = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the width of the texture
 	textureRect.h = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the height of the texture
-	positions = m_obstacleComponentMgr.getPositions();
+	auto positions = m_obstacleComponentMgr.getPositions();
 	size = m_obstacleComponentMgr.getSize();
 	for (size_t i = 0; i < size; ++i) {
 		textureRect.x = (int)positions[i].x;
@@ -437,7 +439,9 @@ void Game::checkCollisionsEnemyProjectiles()
 
 void Game::checkCollissionsEnemyWithPlayer()
 {
-	vec2* enemyPositions = m_enemyComponentMgr.getPositions();
+	//vec2* enemyPositions = m_enemyComponentMgr.getPositions();
+	float* enemyXCoords = m_enemyComponentMgr.getXCoords();
+	float* enemyYCoords = m_enemyComponentMgr.getYCoords();
 	size_t enemyInstances = m_enemyComponentMgr.getSize();
 	SDL_Rect enemyRect, playerRect;
 	playerRect.x = (int)m_player.getPosition().x;
@@ -449,8 +453,8 @@ void Game::checkCollissionsEnemyWithPlayer()
 	enemyRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;
 
 	for (size_t i = 0; i < enemyInstances; ++i) {
-		enemyRect.x = (int)enemyPositions[i].x;
-		enemyRect.y = (int)enemyPositions[i].y;
+		enemyRect.x = (int)enemyXCoords[i];
+		enemyRect.y = (int)enemyYCoords[i];
 		if (SDL_HasIntersection(&enemyRect, &playerRect)) {
 			m_player.setLife(0);			
 			gameOver();
