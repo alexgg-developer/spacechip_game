@@ -26,7 +26,8 @@ private :
 	struct InstanceData {
 		int32_t* life;
 		Entity* entity;
-		vec2* position;
+		float* x;
+		float* y;
 	};
 
 	InstanceData m_data;
@@ -38,8 +39,9 @@ public:
 	static const size_t OBSTACLE_SIZE;
 	
 	inline int32_t getLife(Instance i) { ASSERT(i.i < m_instanceCount); return m_data.life[i.i]; }
-	inline vec2 getPosition(const Entity& e) const { return m_data.position[lookup(e).i];  }
-	inline vec2* const getPositions() const { return m_data.position;  }
+	inline vec2 getPosition(const Entity& e) const { Instance i = lookup(e); return vec2{ m_data.x[i.i], m_data.y[i.i] }; }
+	inline float* const getXCoords() const { return m_data.x; }
+	inline float* const getYCoords() const { return m_data.y; }
 	inline size_t const getSize() const { return m_instanceCount;  }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 	

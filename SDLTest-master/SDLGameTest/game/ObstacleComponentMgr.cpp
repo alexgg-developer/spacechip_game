@@ -20,7 +20,8 @@ void ObstacleComponentMgr::destroy(const Entity & e)
 
 	m_data.entity[i.i] = m_data.entity[last];
 	m_data.life[i.i] = m_data.life[last];
-	m_data.position[i.i] = m_data.position[last];
+	m_data.x[i.i] = m_data.x[last];
+	m_data.y[i.i] = m_data.y[last];
 
 	m_map[lastEntity.index()] = i;
 
@@ -30,7 +31,8 @@ void ObstacleComponentMgr::destroy(const Entity & e)
 void ObstacleComponentMgr::reset()
 {
 	memset(m_data.life, 0, m_capacity * sizeof(int32_t));
-	memset(m_data.position, 0, m_capacity * sizeof(vec2));
+	memset(m_data.x, 0, m_capacity * sizeof(float));
+	memset(m_data.y, 0, m_capacity * sizeof(float));
 	memset(m_data.entity, 0, m_capacity * sizeof(Entity));
 	m_map.clear();
 	m_instanceCount = 0;
@@ -44,8 +46,8 @@ Entity ObstacleComponentMgr::checkShot(const SDL_Rect & rect)
 	textureRect.w = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the width of the texture
 	textureRect.h = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the height of the texture
 	for (size_t i = 0; i < m_instanceCount; ++i) {
-		textureRect.x = (int)m_data.position[i].x;
-		textureRect.y = (int)m_data.position[i].y;
+		textureRect.x = (int)m_data.x[i];
+		textureRect.y = (int)m_data.y[i];
 		if (SDL_HasIntersection(&rect, &textureRect)) {
 			entityShot = m_data.entity[i];
 			break;
@@ -59,7 +61,8 @@ Entity ObstacleComponentMgr::checkShot(const SDL_Rect & rect)
 void ObstacleComponentMgr::allocate(size_t size)
 {
 	m_data.life = static_cast<int32_t*>(MemoryPool::Get(size * sizeof(int32_t)));
-	m_data.position = static_cast<vec2*>(MemoryPool::Get(size * sizeof(vec2)));
+	m_data.x = static_cast<float*>(MemoryPool::Get(size * sizeof(float)));
+	m_data.y = static_cast<float*>(MemoryPool::Get(size * sizeof(float)));
 	m_data.entity = static_cast<Entity*>(MemoryPool::Get(size * sizeof(Entity)));
 
 	m_instanceCount = 0;
@@ -71,7 +74,8 @@ void ObstacleComponentMgr::add(const Entity& e, const vec2& position)
 	auto instance = Instance::create(m_instanceCount);
 	m_map[e.index()] = instance;
 	m_data.life[instance.i] = rand() % 5u + 1u;
-	m_data.position[instance.i] = position;
+	m_data.x[instance.i] = position.x;
+	m_data.y[instance.i] = position.y;
 	m_data.entity[instance.i] = e;
 
 	++m_instanceCount;

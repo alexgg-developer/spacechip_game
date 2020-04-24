@@ -176,7 +176,6 @@ void Game::draw()
 	SDL_Rect textureRect;
 	textureRect.w = (int)EnemyComponentMgr::ENEMY_SIZE;  // the width of the texture
 	textureRect.h = (int)EnemyComponentMgr::ENEMY_SIZE;  // the height of the texture
-	//auto positions = m_enemyComponentMgr.getPositions();
 	auto xCoords = m_enemyComponentMgr.getXCoords();
 	auto yCoords = m_enemyComponentMgr.getYCoords();
 	auto size = m_enemyComponentMgr.getSize();
@@ -210,11 +209,12 @@ void Game::draw()
 	SDL_Texture* textureObstacle = m_textureMgr.getTexture(TextureMgr::TextureID::OBSTACLE);
 	textureRect.w = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the width of the texture
 	textureRect.h = (int)ObstacleComponentMgr::OBSTACLE_SIZE;  // the height of the texture
-	auto positions = m_obstacleComponentMgr.getPositions();
+	xCoords = m_obstacleComponentMgr.getXCoords();
+	yCoords = m_obstacleComponentMgr.getYCoords();
 	size = m_obstacleComponentMgr.getSize();
 	for (size_t i = 0; i < size; ++i) {
-		textureRect.x = (int)positions[i].x;
-		textureRect.y = (int)positions[i].y;
+		textureRect.x = (int)xCoords[i];
+		textureRect.y = (int)yCoords[i];
 		SDL_RenderCopy(m_renderer, textureObstacle, nullptr, &textureRect);
 	}
 

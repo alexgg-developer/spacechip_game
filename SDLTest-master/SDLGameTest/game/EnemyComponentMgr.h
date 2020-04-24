@@ -41,14 +41,12 @@ public:
 
 	inline int32_t getLife(Instance i) { ASSERT(i.i < m_instanceCount); return m_data.life[i.i]; }
 	inline vec2 getPosition(const Entity& e) const { Instance i = lookup(e); return vec2{ m_data.x[i.i], m_data.y[i.i] }; }
-	//inline vec2* const getPositions() const { return m_data.position;  }
 	inline float* const getXCoords() const { return m_data.x;  }
 	inline float* const getYCoords() const { return m_data.y;  }
 	inline size_t const getSize() const { return m_instanceCount;  }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 	
 	void add(const Entity& e, const vec2& position);
-	//void allocate(size_t size) override;
 	void allocate(size_t size);
 	void checkLimits();
 	Entity checkShot(const SDL_Rect& rect);
