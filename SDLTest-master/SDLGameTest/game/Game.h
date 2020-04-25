@@ -15,6 +15,7 @@
 #include "ProjectileComponentMgr.h"
 #include "ObstacleComponentMgr.h"
 #include "TextComponentMgr.h"
+#include "AnimationComponentMgr.h"
 #include "Player.h"
 #include "Input.h"
 #include "Timer.h"
@@ -36,7 +37,7 @@ public:
 private:
 	static constexpr size_t WINDOW_WIDTH = 800u;
 	static constexpr size_t WINDOW_HEIGHT = 600u;
-	static const size_t MAXIMUM_SHOTS_PLAYER = 3;
+	static const size_t MAXIMUM_SHOTS_PLAYER = 3u;
 	static const float INTERVAL_ENEMIES_SHOOT;
 
 	enum GameState : uint32_t {
@@ -54,6 +55,7 @@ private:
 	ObstacleComponentMgr m_obstacleComponentMgr;
 	ProjectileComponentMgr m_projectileComponentMgr;	
 	TextComponentMgr m_textComponentMgr;
+	AnimationComponentMgr m_animationComponentMgr;
 	std::vector<Entity> m_playerProjectiles;
 	std::vector<Entity> m_enemyProjectiles;
 	std::vector<Entity> m_enemies;
@@ -65,6 +67,7 @@ private:
 	EntityManager m_entityManager;
 	ScoreMgr m_scoreMgr;
 	TextureMgr m_textureMgr;
+
 
 	float m_timerEnemyShoot;
 	GameState m_state = GameState::DEFAULT;

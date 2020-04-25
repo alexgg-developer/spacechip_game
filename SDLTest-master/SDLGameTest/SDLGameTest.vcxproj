@@ -152,6 +152,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game\AnimationComponentMgr.cpp" />
     <ClCompile Include="game\EnemyComponentMgr.cpp" />
     <ClCompile Include="dodf\Entity.cpp" />
     <ClCompile Include="dodf\EntityManager.cpp" />
@@ -170,6 +171,7 @@ COPY $(SolutionDir)\Libraries\SDL2_image-2.0.5\lib\$(PlatformTarget)\*.dll $(Tar
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dodf\Assert.h" />
+    <ClInclude Include="game\AnimationComponentMgr.h" />
     <ClInclude Include="game\EnemyComponentMgr.h" />
     <ClInclude Include="dodf\Entity.h" />
     <ClInclude Include="dodf\EntityManager.h" />

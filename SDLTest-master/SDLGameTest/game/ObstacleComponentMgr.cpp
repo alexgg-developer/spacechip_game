@@ -14,7 +14,6 @@ void ObstacleComponentMgr::destroy(const Entity & e)
 	size_t last = m_instanceCount - 1;
 	auto index = e.index();
 	Instance i = lookup(e);
-	m_map.erase(e.index());
 
 	Entity lastEntity = m_data.entity[last];
 
@@ -24,6 +23,7 @@ void ObstacleComponentMgr::destroy(const Entity & e)
 	m_data.y[i.i] = m_data.y[last];
 
 	m_map[lastEntity.index()] = i;
+	m_map.erase(index);
 
 	--m_instanceCount;
 }

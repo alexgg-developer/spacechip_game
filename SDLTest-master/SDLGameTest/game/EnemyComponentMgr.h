@@ -19,7 +19,6 @@
 
 using namespace std;
 
-//class EnemyComponentMgr: public IComponentManager 
 class EnemyComponentMgr  
 {
 private :
@@ -50,7 +49,6 @@ public:
 	void allocate(size_t size);
 	void checkLimits();
 	Entity checkShot(const SDL_Rect& rect);
-	void clean();
 	void destroy(const Entity& e);
 	void reset();
 	void setLife(Instance i, int32_t life);

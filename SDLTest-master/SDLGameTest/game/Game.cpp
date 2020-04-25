@@ -33,18 +33,19 @@ int Game::init()
 	
 	size_t initSize = 512 * 1024 * 1024; //512MB
 	dodf::MemoryPool::Initialize(initSize);
-	
+
+	error = m_textureMgr.init(m_renderer);
+	if (error) return error;
 	
 	m_scoreMgr.init();
-
+	m_animationComponentMgr.allocate(100u);
 	initProjectiles();
 	initEnemies(true);
 	initObstacles(true);
 	initPlayer();
-	initUI(true);	
+	initUI(true);
+	
 
-	error = m_textureMgr.init(m_renderer);
-	if (error) return error;
 
 	return error;
 }
@@ -124,6 +125,14 @@ void Game::initPlayer()
 	m_player.setPosition(position);
 	m_playerController.setLimits(30.0f, static_cast<float>(WINDOW_WIDTH) - 30.0f - static_cast<float>(Player::SIZE));
 	m_playerController.setShootCallback(std::bind(&Game::shoot, this));
+	Entity playerEntity = m_entityManager.create();
+	m_player.setEntity(playerEntity);
+	m_animationComponentMgr.add(playerEntity, 
+		position, 
+		0.5f, 
+		m_textureMgr.getFrames(TextureMgr::AnimationID::PLAYER_ANIM), 
+		AnimationComponentMgr::AnimationType::LOOP,
+		TextureMgr::AnimationID::PLAYER_ANIM);
 }
 
 void Game::run()
@@ -144,6 +153,8 @@ void Game::run()
 			checkCollissionsEnemyWithPlayer();
 			checkCollisionsPlayerProjectile();
 			checkCollisionsEnemyProjectiles();
+			m_animationComponentMgr.setPosition(m_player.getEntity(), m_player.getPosition());
+			m_animationComponentMgr.update(dt);
 
 			m_timerEnemyShoot += dt;
 			if (m_timerEnemyShoot >= INTERVAL_ENEMIES_SHOOT) {
@@ -185,14 +196,6 @@ void Game::draw()
 		SDL_RenderCopy(m_renderer, textureEnemy, nullptr, &textureRect);
 	}
 
-	SDL_Texture* texturePlayer = m_textureMgr.getTexture(TextureMgr::TextureID::PLAYER);
-	auto playerPosition = m_player.getPosition();
-	textureRect.x = (int)playerPosition.x;   // the x coordinate
-	textureRect.y = (int)playerPosition.y;   // the y coordinate
-	textureRect.w = (int)Player::SIZE;  // the width of the texture
-	textureRect.h = (int)Player::SIZE;  // the height of the texture
-	SDL_RenderCopy(m_renderer, texturePlayer, nullptr, &textureRect);
-
 
 	SDL_Texture** textures = m_textureMgr.getTextures();
 	xCoords = m_projectileComponentMgr.getXCoords();
@@ -231,6 +234,27 @@ void Game::draw()
 		textureRect.h = (int)height[i];  // the height of the texture
 		SDL_RenderCopy(m_renderer, textTextures[i], nullptr, &textureRect);
 	}
+	   
+	/*SDL_Texture* texturePlayer = m_textureMgr.getTexture(TextureMgr::TextureID::PLAYER);
+	auto playerPosition = m_player.getPosition();
+	textureRect.x = (int)playerPosition.x;   // the x coordinate
+	textureRect.y = (int)playerPosition.y;   // the y coordinate
+	textureRect.w = (int)Player::SIZE;  // the width of the texture
+	textureRect.h = (int)Player::SIZE;  // the height of the texture
+	SDL_RenderCopy(m_renderer, texturePlayer, nullptr, &textureRect);*/
+	size = m_animationComponentMgr.getSize();
+	xCoords = m_animationComponentMgr.getXCoords();
+	yCoords = m_animationComponentMgr.getYCoords();
+	auto currentFrames = m_animationComponentMgr.getCurrentFrames();
+	auto animationIDs = m_animationComponentMgr.getAnimationID();
+	for (size_t i = 0; i < size; ++i) {
+		textureRect.x = (int)xCoords[i];
+		textureRect.y = (int)yCoords[i];
+		textureRect.w = (int)Player::SIZE;  // the width of the texture
+		textureRect.h = (int)Player::SIZE;  // the height of the texture
+		SDL_RenderCopy(m_renderer, m_textureMgr.getFrame(animationIDs[i], currentFrames[i]), nullptr, &textureRect);
+	}
+
 
 	SDL_RenderPresent(m_renderer);
 }
@@ -479,7 +503,7 @@ void Game::win()
 {
 	m_state = GameState::WIN;
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 100u }, "You win!", m_renderer);
-	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 50u }, "Press enter to restart", m_renderer);
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 50u }, "Press enter to level up", m_renderer);
 
 	m_scoreMgr.saveHighScore();
 }
@@ -504,6 +528,8 @@ void Game::restart()
 
 	m_textComponentMgr.reset();
 	initUI(false);
+
+	m_animationComponentMgr.reset();
 
 	m_timer.restart();
 	m_state = GameState::DEFAULT;

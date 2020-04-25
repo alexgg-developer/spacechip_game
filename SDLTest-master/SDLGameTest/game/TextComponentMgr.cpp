@@ -97,6 +97,7 @@ void TextComponentMgr::destroy(const Entity & e)
 {
 	Instance i = lookup(e);
 	size_t last = m_instanceCount - 1;
+	auto index = e.index();
 
 	SDL_DestroyTexture(m_data.textures[i.i]);
 
@@ -108,7 +109,7 @@ void TextComponentMgr::destroy(const Entity & e)
 	m_data.textures[i.i] = m_data.textures[last];
 
 	m_map[lastEntity.index()] = i;
-	m_map.erase(e.index());
+	m_map.erase(index);
 
 	--m_instanceCount;
 }

@@ -25,3 +25,8 @@ void Player::setPosition(const vec2& newPosition)
 {
 	m_position = newPosition;
 }
+
+void Player::setEntity(const Entity & entity)
+{
+	m_entity = entity;
+}

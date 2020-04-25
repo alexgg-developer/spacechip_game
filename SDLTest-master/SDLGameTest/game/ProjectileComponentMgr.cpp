@@ -58,7 +58,7 @@ void ProjectileComponentMgr::destroy(Instance i)
 {
 	ASSERT(i.i < m_instanceCount);
 	size_t last = m_instanceCount - 1;
-	m_map.erase(m_data.entity[i.i].index());
+	auto index = m_data.entity[i.i].index();
 
 	Entity lastEntity = m_data.entity[last];
 	m_data.entity[i.i] = m_data.entity[last];
@@ -68,6 +68,7 @@ void ProjectileComponentMgr::destroy(Instance i)
 	m_data.textureID[i.i] = m_data.textureID[last];
 
 	m_map[lastEntity.index()] = i;
+	m_map.erase(index);
 
 	--m_instanceCount;
 }

@@ -60,6 +60,9 @@
     <ClCompile Include="game\ScoreMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\AnimationComponentMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dodf\Instance.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\ScoreMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\AnimationComponentMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
