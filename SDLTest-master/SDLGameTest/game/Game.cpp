@@ -87,7 +87,8 @@ void Game::initEnemies(bool allocate)
 	}		
 	const size_t HORIZONTAL_LIMIT = 5u;
 	m_enemyComponentMgr.setLimits((float)HORIZONTAL_LIMIT, (float)(WINDOW_WIDTH - HORIZONTAL_LIMIT - ENEMY_SIZE));
-	m_enemyComponentMgr.setSpeed(55.0f);
+	const float BASE_SPEED = 35.0f;
+	m_enemyComponentMgr.setSpeed(BASE_SPEED + float(m_currentLevel) * BASE_SPEED * 0.25f);
 	//m_enemyComponentMgr.setSpeed(225.0f);
 }
 
@@ -102,7 +103,7 @@ void Game::initObstacles(bool allocate)
 	constexpr size_t BOTTOM_MARGIN = WINDOW_HEIGHT - TOP_MARGIN * 2u;
 	const size_t ENEMY_SIZE = EnemyComponentMgr::ENEMY_SIZE;
 
-	size_t obstacleCount = OBSTACLE_COUNT;
+	size_t obstacleCount = OBSTACLE_COUNT + m_currentLevel * OBSTACLE_COUNT;
 
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
@@ -160,7 +161,9 @@ void Game::run()
 
 			m_timerEnemyShoot += dt;
 			if (m_timerEnemyShoot >= INTERVAL_ENEMIES_SHOOT) {
-				shootEnemy();
+				if (m_enemies.size() > 0) {
+					shootEnemy();
+				}
 				m_timerEnemyShoot = 0.0f;
 			}
 
@@ -337,6 +340,10 @@ void Game::initUI(bool allocate)
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ 10u, WINDOW_HEIGHT - 30u }, "Life: ", m_renderer);
 	m_lifeText = m_entityManager.create();
 	m_textComponentMgr.add(m_lifeText, vec2{ 100u, WINDOW_HEIGHT - 30u }, std::to_string(m_player.getLife()), m_renderer);
+
+	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH - 165u, WINDOW_HEIGHT - 30u }, "Level: ", m_renderer);
+	m_levelText = m_entityManager.create();
+	m_textComponentMgr.add(m_levelText, vec2{ WINDOW_WIDTH - 65u, WINDOW_HEIGHT - 30u }, std::to_string(m_currentLevel+1), m_renderer);
 }
 
 void Game::shoot()
@@ -357,9 +364,10 @@ void Game::shootEnemy()
 	vec2 position = m_enemyComponentMgr.getPosition(m_enemies[dis(gen)]);
 	position.x += EnemyComponentMgr::ENEMY_SIZE / 2u;
 	position.y += EnemyComponentMgr::ENEMY_SIZE;
+	const float BASE_SPEED = 300.0f;
 	m_projectileComponentMgr.add(m_enemyProjectiles.back(), 
 		position, 
-		300.0f, 
+		BASE_SPEED + float(m_currentLevel) * BASE_SPEED * 0.15f,
 		TextureMgr::TextureID::ENEMY_BULLET);
 }
 
@@ -441,6 +449,9 @@ void Game::checkCollisionsPlayerProjectile()
 					m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
 					m_enemyComponentMgr.destroy(collided);
 					m_entityManager.destroy(collided);
+					if (m_enemies.size() == 0) {
+						win();
+					}
 				}
 				m_projectileComponentMgr.destroy(projectileInstance);
 				m_entityManager.destroy(m_playerProjectiles[i]);
@@ -526,12 +537,20 @@ void Game::win()
 	m_state = GameState::WIN;
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 100u }, "You win!", m_renderer);
 	m_textComponentMgr.add(m_entityManager.create(), vec2{ WINDOW_WIDTH / 2u - 100u, WINDOW_HEIGHT / 2u - 50u }, "Press enter to level up", m_renderer);
-
-	m_scoreMgr.saveHighScore();
+	m_scoreMgr.addScore(ScoreMgr::ScoreID::LEVEL_UP);
+	//m_scoreMgr.saveHighScore();
 }
 
 void Game::restart()
 {
+	if (m_state == GAME_OVER) {
+		m_currentLevel = 0;
+		m_scoreMgr.reset();
+		m_player.reset();
+	}
+	else if(m_state == WIN) {
+		++m_currentLevel;
+	}
 	m_entityManager.reset();
 
 	m_enemyComponentMgr.reset();
@@ -547,10 +566,7 @@ void Game::restart()
 	
 	m_animationComponentMgr.reset();
 
-	m_player.reset();
 	initPlayer();
-
-	m_scoreMgr.reset();
 
 	m_textComponentMgr.reset();
 	initUI(false);

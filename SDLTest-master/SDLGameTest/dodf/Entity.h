@@ -21,7 +21,7 @@ public:
 	uint32_t generation() const { return (id >> ENTITY_INDEX_BITS) & ENTITY_GENERATION_MASK; }
 	bool isValid() { return id != NO_VALUE; }
 
-	friend bool operator== (const Entity &e1, const Entity &e2);
-	friend bool operator< (const Entity &e1, const Entity &e2);
+	friend bool operator==(const Entity &e1, const Entity &e2);
+	friend bool operator<(const Entity &e1, const Entity &e2);
 };
 

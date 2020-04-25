@@ -17,7 +17,6 @@ using namespace std;
 class TextComponentMgr  
 {
 private :
-
 	struct InstanceData {
 		Entity* entity;
 		vec2* position;

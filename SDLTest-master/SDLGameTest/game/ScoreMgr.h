@@ -14,6 +14,7 @@ public:
 	enum ScoreID: uint32_t {
 		ENEMY,
 		OBSTACLE,
+		LEVEL_UP,
 		SIZE
 	};
 	

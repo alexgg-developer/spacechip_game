@@ -38,7 +38,7 @@ private :
 public:
 	static const int32_t OBSTACLE_SIZE;
 	
-	inline int32_t getLife(Instance i) { ASSERT(i.i < m_instanceCount); return m_data.life[i.i]; }
+	inline int32_t getLife(Instance i) const { ASSERT(i.i < m_instanceCount); return m_data.life[i.i]; }
 	inline vec2 getPosition(const Entity& e) const { Instance i = lookup(e); return vec2{ m_data.x[i.i], m_data.y[i.i] }; }
 	inline vec2 getPosition(Instance i) const { ASSERT(i.i < m_instanceCount); return vec2{ m_data.x[i.i], m_data.y[i.i] }; }
 	inline float* const getXCoords() const { return m_data.x; }

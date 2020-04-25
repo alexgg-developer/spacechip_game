@@ -32,12 +32,12 @@ public:
 		SIZE_ANIM
 	};
 
-	inline size_t getFrames(AnimationID animationID) { return m_animationFrames[animationID]; }
-	inline SDL_Texture* getFrame(AnimationID animationID, size_t frame) { return m_animations[animationID * MAX_FRAMES + frame]; }
-	inline int getWidth(AnimationID animationID) { return m_animationsWidth[animationID]; }
-	inline int getHeight(AnimationID animationID) { return m_animationsHeight[animationID]; }
-	inline SDL_Texture* getTexture(TextureID textureID) { return m_textures[textureID]; }
-	inline SDL_Texture** getTextures() { return m_textures; }
+	inline size_t getFrames(AnimationID animationID) const { return m_animationFrames[animationID]; }
+	inline SDL_Texture* getFrame(AnimationID animationID, size_t frame) const { return m_animations[animationID * MAX_FRAMES + frame]; }
+	inline int getWidth(AnimationID animationID) const { return m_animationsWidth[animationID]; }
+	inline int getHeight(AnimationID animationID) const { return m_animationsHeight[animationID]; }
+	inline SDL_Texture* const getTexture(TextureID textureID) const { return m_textures[textureID]; }
+	inline SDL_Texture** getTextures() const { return m_textures; }
 	
 	void clean();
 	int init(SDL_Renderer* const renderer);

@@ -38,7 +38,7 @@ public:
 	inline float* const getXCoords() const { return m_data.x; }
 	inline float* const getYCoords() const { return m_data.y; }
 	inline TextureMgr::TextureID* const getTextureIDs() { return m_data.textureID; }
-	inline size_t const getSize() { return m_instanceCount; }
+	inline size_t getSize() const { return m_instanceCount; }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 
 	void checkOffLimits();

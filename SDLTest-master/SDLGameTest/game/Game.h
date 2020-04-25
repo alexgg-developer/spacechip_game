@@ -37,7 +37,7 @@ public:
 private:
 	static constexpr size_t WINDOW_WIDTH = 800u;
 	static constexpr size_t WINDOW_HEIGHT = 600u;
-	static const size_t MAXIMUM_SHOTS_PLAYER = 3u;
+	static const size_t MAXIMUM_SHOTS_PLAYER = 13u;
 	static const float INTERVAL_ENEMIES_SHOOT;
 
 	enum GameState : uint32_t {
@@ -59,7 +59,7 @@ private:
 	std::vector<Entity> m_playerProjectiles;
 	std::vector<Entity> m_enemyProjectiles;
 	std::vector<Entity> m_enemies;
-	Entity m_maxScoreText, m_currentScoreText, m_lifeText;
+	Entity m_maxScoreText, m_currentScoreText, m_lifeText, m_levelText;
 	Player m_player;
 	Input m_input;
 	Timer m_timer;
@@ -68,7 +68,7 @@ private:
 	ScoreMgr m_scoreMgr;
 	TextureMgr m_textureMgr;
 
-
+	uint32_t m_currentLevel = 0;
 	float m_timerEnemyShoot;
 	GameState m_state = GameState::DEFAULT;
 

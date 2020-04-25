@@ -19,6 +19,7 @@ void ScoreMgr::init()
 {
 	m_scores[ScoreID::ENEMY] = 10;
 	m_scores[ScoreID::OBSTACLE] = 50;
+	m_scores[ScoreID::LEVEL_UP] = 200;
 	m_filename = "highscore.bin";
 	loadHighScore();
 }
