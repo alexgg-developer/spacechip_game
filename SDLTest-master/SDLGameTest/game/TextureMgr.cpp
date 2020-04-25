@@ -30,6 +30,8 @@ int TextureMgr::init(SDL_Renderer* const renderer)
 	error += loadTexture(TextureID::OBSTACLE, "Assets/Aestroids/aestroid_brown.png", renderer);
 
 	error += loadAnimation(AnimationID::PLAYER_ANIM, "Assets/Player/Animation/", "", 1, 8, renderer);
+	error += loadAnimation(AnimationID::EXPLOSION_ANIM, "Assets/Effects/Galaxy/", "galaxy_", 0, 17, renderer);
+	error += loadAnimation(AnimationID::ENEMY_EXPLOSION_ANIM, "Assets/Effects/Red Explosion/", "1_", 0, 17, renderer);
 
 	return error;
 }

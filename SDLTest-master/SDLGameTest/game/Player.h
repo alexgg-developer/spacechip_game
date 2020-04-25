@@ -18,7 +18,7 @@ private :
 	float m_speed = INITIAL_SPEED;
 
 public:
-	static const size_t SIZE; //pixels width and height
+	static const int32_t SIZE; //pixels width and height
 	static const int32_t INITIAL_LIFE;
 	static const float INITIAL_SPEED;
 

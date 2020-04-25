@@ -7,7 +7,7 @@
 
 using namespace dodf;
 
-const size_t EnemyComponentMgr::ENEMY_SIZE = 36;
+const int32_t EnemyComponentMgr::ENEMY_SIZE = 36;
 
 
 void EnemyComponentMgr::destroy(const Entity & e)

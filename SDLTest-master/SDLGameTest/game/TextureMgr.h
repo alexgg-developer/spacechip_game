@@ -27,6 +27,8 @@ public:
 
 	enum AnimationID : uint32_t {
 		PLAYER_ANIM,
+		EXPLOSION_ANIM,
+		ENEMY_EXPLOSION_ANIM,
 		SIZE_ANIM
 	};
 

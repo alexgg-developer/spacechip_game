@@ -6,7 +6,7 @@
 
 using namespace dodf;
 
-const size_t ObstacleComponentMgr::OBSTACLE_SIZE = 55;
+const int32_t ObstacleComponentMgr::OBSTACLE_SIZE = 55;
 
 
 void ObstacleComponentMgr::destroy(const Entity & e)

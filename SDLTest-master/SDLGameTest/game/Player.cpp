@@ -6,7 +6,7 @@
 
 using namespace dodf;
 
-const size_t Player::SIZE = 30u;
+const int32_t Player::SIZE = 30u;
 const int32_t Player::INITIAL_LIFE = 3;
 const float Player::INITIAL_SPEED = 160.0f;
 

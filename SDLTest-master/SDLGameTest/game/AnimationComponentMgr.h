@@ -37,6 +37,8 @@ public:
 	inline size_t const getSize() const { return m_instanceCount;  }
 	inline float* const getXCoords() const { return m_data.x;  }
 	inline float* const getYCoords() const { return m_data.y;  }
+	inline int* const getWidths() const { return m_data.width;  }
+	inline int* const getHeights() const { return m_data.height;  }
 	inline Instance lookup(const Entity& e) const { return m_map.at(e.index()); }
 	
 	void add(const Entity& e,
@@ -44,7 +46,9 @@ public:
 		float timePerFrame,
 		size_t frames,
 		AnimationType type,
-		TextureMgr::AnimationID animationID
+		TextureMgr::AnimationID animationID,
+		int32_t width,
+		int32_t height
 	);
 	void allocate(size_t size);
 	void destroy(Instance i);
@@ -65,6 +69,8 @@ private:
 		size_t* frames;
 		size_t* currentFrame;
 		AnimationType* type;
+		int32_t* width;
+		int32_t* height;
 	};
 
 	InstanceData m_data;

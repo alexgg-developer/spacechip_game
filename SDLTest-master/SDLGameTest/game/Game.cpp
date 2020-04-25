@@ -132,7 +132,9 @@ void Game::initPlayer()
 		0.5f, 
 		m_textureMgr.getFrames(TextureMgr::AnimationID::PLAYER_ANIM), 
 		AnimationComponentMgr::AnimationType::LOOP,
-		TextureMgr::AnimationID::PLAYER_ANIM);
+		TextureMgr::AnimationID::PLAYER_ANIM,
+		Player::SIZE,
+		Player::SIZE);
 }
 
 void Game::run()
@@ -247,11 +249,13 @@ void Game::draw()
 	yCoords = m_animationComponentMgr.getYCoords();
 	auto currentFrames = m_animationComponentMgr.getCurrentFrames();
 	auto animationIDs = m_animationComponentMgr.getAnimationID();
+	int32_t* widthAnimations = m_animationComponentMgr.getWidths();
+	int32_t* heightAnimations = m_animationComponentMgr.getHeights();
 	for (size_t i = 0; i < size; ++i) {
 		textureRect.x = (int)xCoords[i];
 		textureRect.y = (int)yCoords[i];
-		textureRect.w = (int)Player::SIZE;  // the width of the texture
-		textureRect.h = (int)Player::SIZE;  // the height of the texture
+		textureRect.w = widthAnimations[i];
+		textureRect.h = heightAnimations[i];
 		SDL_RenderCopy(m_renderer, m_textureMgr.getFrame(animationIDs[i], currentFrames[i]), nullptr, &textureRect);
 	}
 
@@ -397,6 +401,15 @@ void Game::checkCollisionsPlayerProjectile()
 			else {
 				m_scoreMgr.addScore(ScoreMgr::ScoreID::OBSTACLE);
 				m_textComponentMgr.setText(m_currentScoreText, std::to_string(m_scoreMgr.getCurrentScore()), m_renderer);
+				auto position = m_obstacleComponentMgr.getPosition(obstacleInstance);
+				m_animationComponentMgr.add(m_entityManager.create(),
+					position,
+					0.05f,
+					m_textureMgr.getFrames(TextureMgr::AnimationID::EXPLOSION_ANIM),
+					AnimationComponentMgr::AnimationType::ONE_SHOT,
+					TextureMgr::AnimationID::EXPLOSION_ANIM,
+					ObstacleComponentMgr::OBSTACLE_SIZE,
+					ObstacleComponentMgr::OBSTACLE_SIZE);
 				m_obstacleComponentMgr.destroy(collided);
 				m_entityManager.destroy(collided);
 			}
@@ -414,6 +427,15 @@ void Game::checkCollisionsPlayerProjectile()
 					m_enemyComponentMgr.setLife(enemyInstance, life);
 				}
 				else {
+					auto position = m_enemyComponentMgr.getPosition(enemyInstance);
+					m_animationComponentMgr.add(m_entityManager.create(),
+						position,
+						0.05f,
+						m_textureMgr.getFrames(TextureMgr::AnimationID::ENEMY_EXPLOSION_ANIM),
+						AnimationComponentMgr::AnimationType::ONE_SHOT,
+						TextureMgr::AnimationID::ENEMY_EXPLOSION_ANIM,
+						EnemyComponentMgr::ENEMY_SIZE,
+						EnemyComponentMgr::ENEMY_SIZE);
 					m_scoreMgr.addScore(ScoreMgr::ScoreID::ENEMY);
 					m_textComponentMgr.setText(m_currentScoreText, std::to_string(m_scoreMgr.getCurrentScore()), m_renderer);
 					m_enemies.erase(std::lower_bound(m_enemies.begin(), m_enemies.end(), collided));
@@ -523,13 +545,16 @@ void Game::restart()
 	m_playerProjectiles.clear();
 	m_enemyProjectiles.clear();
 	
+	m_animationComponentMgr.reset();
+
 	m_player.reset();
+	initPlayer();
+
 	m_scoreMgr.reset();
 
 	m_textComponentMgr.reset();
 	initUI(false);
 
-	m_animationComponentMgr.reset();
 
 	m_timer.restart();
 	m_state = GameState::DEFAULT;

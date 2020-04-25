@@ -13,6 +13,8 @@ void AnimationComponentMgr::destroy(Instance i)
 	auto indexEntity = m_data.entity[i.i].index();
 	size_t last = m_instanceCount - 1;	
 	Entity lastEntity = m_data.entity[last];
+	
+	m_data.animationID[i.i] = m_data.animationID[last];
 	m_data.entity[i.i] = m_data.entity[last];
 	m_data.x[i.i] = m_data.x[last];
 	m_data.y[i.i] = m_data.y[last];
@@ -21,6 +23,8 @@ void AnimationComponentMgr::destroy(Instance i)
 	m_data.frames[i.i] = m_data.frames[last];
 	m_data.currentFrame[i.i] = m_data.currentFrame[last];
 	m_data.type[i.i] = m_data.type[last];
+	m_data.width[i.i] = m_data.width[last];
+	m_data.height[i.i] = m_data.height[last];
 
 	m_map[lastEntity.index()] = i;
 	m_map.erase(indexEntity);
@@ -44,6 +48,8 @@ void AnimationComponentMgr::reset()
 	memset(m_data.frames, 0, m_capacity * sizeof(size_t));
 	memset(m_data.currentFrame, 0, m_capacity * sizeof(size_t));
 	memset(m_data.type, 0, m_capacity * sizeof(AnimationType));
+	memset(m_data.width, 0, m_capacity * sizeof(int32_t));
+	memset(m_data.height, 0, m_capacity * sizeof(int32_t));
 	
 	m_map.clear();
 	m_instanceCount = 0;
@@ -68,6 +74,8 @@ void AnimationComponentMgr::allocate(size_t size)
 	m_data.frames = static_cast<size_t*>(MemoryPool::Get(size * sizeof(size_t)));
 	m_data.currentFrame = static_cast<size_t*>(MemoryPool::Get(size * sizeof(size_t)));
 	m_data.type = static_cast<AnimationType*>(MemoryPool::Get(size * sizeof(AnimationType)));
+	m_data.width = static_cast<int32_t*>(MemoryPool::Get(size * sizeof(int32_t)));
+	m_data.height = static_cast<int32_t*>(MemoryPool::Get(size * sizeof(int32_t)));
 	
 	m_instanceCount = 0;
 	m_capacity = size;
@@ -78,13 +86,15 @@ void AnimationComponentMgr::add(const Entity& e,
 	float timePerFrame, 
 	size_t frames, 
 	AnimationType type,
-	TextureMgr::AnimationID animationID
+	TextureMgr::AnimationID animationID,
+	int32_t width,
+	int32_t height
 	)
 {
 	auto instance = Instance::create(m_instanceCount);
 	m_map[e.index()] = instance;
-	m_data.entity[instance.i] = e;
 	m_data.animationID[instance.i] = animationID;
+	m_data.entity[instance.i] = e;
 	m_data.x[instance.i] = position.x;
 	m_data.y[instance.i] = position.y;
 	m_data.timePerFrame[instance.i] = timePerFrame;
@@ -92,6 +102,8 @@ void AnimationComponentMgr::add(const Entity& e,
 	m_data.frames[instance.i] = frames;
 	m_data.currentFrame[instance.i] = 0u;
 	m_data.type[instance.i] = type;
+	m_data.width[instance.i] = width;
+	m_data.height[instance.i] = height;
 
 	++m_instanceCount;
 }
@@ -106,7 +118,7 @@ void AnimationComponentMgr::update(float dt)
 			if (m_data.currentFrame[i] == m_data.frames[i]) {
 				m_data.currentFrame[i] = 0;
 				if (m_data.type[i] == AnimationType::ONE_SHOT) {
-					destroy(Instance::create(i));
+	 				destroy(Instance::create(i));
 				}
 			}
 		}
